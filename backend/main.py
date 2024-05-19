@@ -25,9 +25,14 @@ def create_user():
         return jsonify({"error": "Username, password, email, and age are required"}), 400
 
     # Check if the username already exists
-    user = users_collection.find_one({'username': username})
-    if user:
+    existing_user = users_collection.find_one({'username': username})
+    if existing_user:
         return jsonify({"error": "Username already exists"}), 400
+
+    # Check if the email already exists
+    existing_email = users_collection.find_one({'email': email})
+    if existing_email:
+        return jsonify({"error": "Email already exists"}), 400
 
     # Hash the password before storing it
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
