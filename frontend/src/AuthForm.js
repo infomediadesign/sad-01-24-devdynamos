@@ -45,7 +45,7 @@ const AuthForm = () => {
   return (
     <div>
       <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="form-container">
         <input
           type="text"
           name="username"
