@@ -10,9 +10,7 @@ const App: React.FC = () => {
                         <li>
                             <Link to="/">Home</Link>
                         </li>
-                        <li>
-                            <Link to="/muscle-group-map">Muscle Group Map</Link>
-                        </li>
+                       
                     </ul>
                 </nav>
             </header>

@@ -54,11 +54,11 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2 style={{ color: 'white' }}>{isLogin ? 'Login' : 'Sign Up'}</h2>
-      <form onSubmit={handleSubmit} className="form-container">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-no-repeat bg-fixed bg-center" style={{ backgroundImage: 'url(https://t3.ftcdn.net/jpg/04/29/35/62/360_F_429356296_CVQ5LkC6Pl55kUNLqLisVKgTw9vjyif1.jpg)' }}>
+      <h2 className="text-white">{isLogin ? 'Login' : 'Sign Up'}</h2>
+      <form onSubmit={handleSubmit} className="mt-5 p-5 bg-black bg-opacity-50 rounded-lg max-w-sm w-full">
         <input
-          className="input-field"
+          className="w-full p-2 mb-4 rounded-lg"
           type="text"
           name="username"
           placeholder="Username"
@@ -67,7 +67,7 @@ const AuthForm: React.FC = () => {
           required
         />
         <input
-          className="input-field"
+          className="w-full p-2 mb-4 rounded-lg"
           type="password"
           name="password"
           placeholder="Password"
@@ -78,7 +78,7 @@ const AuthForm: React.FC = () => {
         {!isLogin && (
           <>
             <input
-              className="input-field"
+              className="w-full p-2 mb-4 rounded-lg"
               type="email"
               name="email"
               placeholder="Email"
@@ -87,7 +87,7 @@ const AuthForm: React.FC = () => {
               required
             />
             <input
-              className="input-field"
+              className="w-full p-2 mb-4 rounded-lg"
               type="number"
               name="age"
               placeholder="Age"
@@ -97,14 +97,14 @@ const AuthForm: React.FC = () => {
             />
           </>
         )}
-        <button type="submit" className="submit-button" disabled={isLoading}>
+        <button type="submit" className="w-full p-2 mt-4 rounded-lg bg-blue-400 text-gray-900" disabled={isLoading}>
           {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up'}
         </button>
       </form>
-      <p className="toggle-text" onClick={() => setIsLogin(!isLogin)}>
+      <p className="mt-4 cursor-pointer text-blue-400" onClick={() => setIsLogin(!isLogin)}>
         {isLogin ? 'Need an account? Sign up here.' : 'Already have an account? Log in here.'}
       </p>
-      {message && <p className="message">{message}</p>}
+      {message && <p className="mt-4 text-white">{message}</p>}
     </div>
   );
 };
