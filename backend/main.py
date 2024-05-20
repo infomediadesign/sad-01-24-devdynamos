@@ -11,6 +11,7 @@ app.config.from_object(Config)
 mongo = PyMongo(app)
 users_collection = mongo.db.users
 
+
 swagger = Swagger(app)
 CORS(app)  # Enable CORS for all routes
 
@@ -53,7 +54,7 @@ def create_user():
     if not username or not password or not email or age is None:
         return jsonify({"error": "Username, password, email, and age are required"}), 400
     
-    if age < 18:
+    if  int(age) < 18:
         return jsonify({"error": "You must be 18 or older to register"}), 400
     
     if len(password) < 8 or not re.search("[0-9]", password) or not re.search("[!@#$%^&*]", password):
@@ -109,7 +110,7 @@ def login():
     
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
         token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
-        return jsonify({"token": token}), 200
+        return jsonify({"jwt_token": token}), 200
     
     else:
         return jsonify({"error": "Invalid username or password"}), 400
