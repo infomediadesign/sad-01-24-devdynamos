@@ -19,26 +19,28 @@ def create_user():
     """Register a new user.
     ---
     parameters:
-      - name: username
-        in: formData
-        type: string
-        required: true
-        description: Username for registration.
-      - name: password
-        in: formData
-        type: string
-        required: true
-        description: Password for registration.
-      - name: email
-        in: formData
-        type: string
-        required: true
-        description: Email for registration.
-      - name: age
-        in: formData
-        type: integer
-        required: true
-        description: Age for registration.
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              description: Username for registration.
+            password:
+              type: string
+              description: Password for registration.
+            email:
+              type: string
+              description: Email for registration.
+            age:
+              type: integer
+              description: Age for registration.
+        required:
+          - username
+          - password
+          - email
+          - age
     responses:
       201:
         description: User created successfully.
@@ -65,16 +67,20 @@ def login():
     """Log in to the system.
     ---
     parameters:
-      - name: username
-        in: formData
-        type: string
-        required: true
-        description: Username for login.
-      - name: password
-        in: formData
-        type: string
-        required: true
-        description: Password for login.
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              description: Username for login.
+            password:
+              type: string
+              description: Password for login.
+        required:
+          - username
+          - password
     responses:
       200:
         description: JWT token generated successfully.
