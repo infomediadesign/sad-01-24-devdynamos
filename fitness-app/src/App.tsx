@@ -1,17 +1,4 @@
 import React from 'react';
-<<<<<<< Updated upstream
-import logo from './logo.svg';
-import './App.css';
-import AuthForm from './services/AuthForm';
-
-function App() {
-  return (
-    <div className="App">
-    <AuthForm />
-    </div>
-  );
-}
-=======
 import { Outlet, Link } from 'react-router-dom';
 
 const App: React.FC = () => {
@@ -35,6 +22,6 @@ const App: React.FC = () => {
         </div>
     );
 };
->>>>>>> Stashed changes
+
 
 export default App;
