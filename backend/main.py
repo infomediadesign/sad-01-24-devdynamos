@@ -4,11 +4,13 @@ import bcrypt, jwt, datetime
 from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 mongo = PyMongo(app)
+CORS(app, origins='http://localhost:3000')
 users_collection = mongo.db.users
 
 swagger = Swagger(app)
@@ -16,6 +18,7 @@ CORS(app)  # Enable CORS for all routes
 
 @app.route('/registration', methods=['POST'])
 def create_user():
+<<<<<<< HEAD
     """Register a new user.
     ---
     parameters:
@@ -48,6 +51,9 @@ def create_user():
         description: Error message if registration fails.
     """
     data = request.get_json()
+=======
+    data = request.get_json(force=True)
+>>>>>>> 8dc3930 (added login and signup page)
     username, password, email, age = data.get('username'), data.get('password'), data.get('email'), data.get('age')
     if not username or not password or not email or age is None:
         return jsonify({"error": "Username, password, email, and age are required"}), 400
@@ -64,6 +70,7 @@ def create_user():
 
 @app.route('/login', methods=['POST'])
 def login():
+<<<<<<< HEAD
     """Log in to the system.
     ---
     parameters:
@@ -88,6 +95,9 @@ def login():
         description: Error message if login fails.
     """
     data = request.get_json()
+=======
+    data = request.get_json(force=True)
+>>>>>>> 8dc3930 (added login and signup page)
     username, password = data.get('username'), data.get('password')
     if not username or not password:
         return jsonify({"error": "Username and password are required"}), 400
