@@ -1,13 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import AuthForm from './services/AuthForm';
 
 function App() {
   return (
     <div className="App">
-      <h1 className="text-3xl font-bold underline items-center m-10">
-      Fitness Tracker
-    </h1>
+    <AuthForm />
     </div>
   );
 }
