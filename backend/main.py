@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 import bcrypt, jwt, datetime
 from flasgger import Swagger
+from flask_cors import CORS
 from config import Config
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ mongo = PyMongo(app)
 users_collection = mongo.db.users
 
 swagger = Swagger(app)
+CORS(app)  # Enable CORS for all routes
 
 @app.route('/registration', methods=['POST'])
 def create_user():
