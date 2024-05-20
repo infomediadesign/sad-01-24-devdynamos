@@ -1,9 +1,11 @@
 .App {
   text-align: center;
+  background-image: url('https://media.self.com/photos/5e99d02681d01d00081851ca/2:1/w_1280,c_limit/weights-yoga-mat.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -11,6 +13,8 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent black background */
+  padding: 20px;
 }
 
 input {
