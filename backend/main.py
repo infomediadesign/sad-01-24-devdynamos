@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
-import bcrypt, jwt, datetime
+import bcrypt, jwt, datetime, re
 from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
@@ -51,6 +51,10 @@ def create_user():
     username, password, email, age = data.get('username'), data.get('password'), data.get('email'), data.get('age')
     if not username or not password or not email or age is None:
         return jsonify({"error": "Username, password, email, and age are required"}), 400
+    if age < 18:
+        return jsonify({"error": "You must be 18 or older to register"}), 400
+    if len(password) < 8 or not re.search("[0-9]", password) or not re.search("[!@#$%^&*]", password):
+        return jsonify({"error": "Password must be at least 8 characters long and contain at least one special character and one number"}), 400
     existing_user = users_collection.find_one({'username': username})
     if existing_user:
         return jsonify({"error": "Username already exists"}), 400
