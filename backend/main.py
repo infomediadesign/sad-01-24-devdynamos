@@ -48,6 +48,7 @@ def create_user():
         description: Error message if registration fails.
     """
     data = request.get_json()
+    data = request.get_json(force=True)
     username, password, email, age = data.get('username'), data.get('password'), data.get('email'), data.get('age')
     if not username or not password or not email or age is None:
         return jsonify({"error": "Username, password, email, and age are required"}), 400
@@ -92,6 +93,7 @@ def login():
         description: Error message if login fails.
     """
     data = request.get_json()
+    data = request.get_json(force=True)
     username, password = data.get('username'), data.get('password')
     if not username or not password:
         return jsonify({"error": "Username and password are required"}), 400
