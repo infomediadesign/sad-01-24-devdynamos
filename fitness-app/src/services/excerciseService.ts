@@ -1,26 +1,27 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; 
-
-export const getExercisesByBodyPart = async (bodyPart: string) => {
-    try {
-        const response = await axios.get(`${API_URL}/exercises/${bodyPart}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching exercises', error);
-        throw error;
-    }
-};
-
+const API_URL = 'http://localhost:5000/api';
 
 export interface Exercise {
     id: string;
     muscleName: string;
     videoUrl: string;
     description: string[];
-  }
-  
-  export const fetchExerciseByMuscleGroup = async (muscleGroup: string): Promise<Exercise> => {
+}
+
+export const fetchExerciseByMuscleGroup = async (muscleGroup: string): Promise<Exercise> => {
+    try {
+        const response = await axios.get(`${API_URL}/exercises/${muscleGroup}`);
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError<{ error: string }>;
+        console.error('Error fetching exercise data:', axiosError);
+        throw new Error(axiosError.response?.data?.error || 'Network error');
+    }
+};
+
+/* Dummy Data for Development (Commented Out)
+export const fetchExerciseByMuscleGroup = async (muscleGroup: string): Promise<Exercise> => {
     // Dummy data
     const dummyData: { [key: string]: Exercise } = {
       biceps: {
@@ -51,5 +52,6 @@ export interface Exercise {
         resolve(dummyData[muscleGroup] || null);
       }, 1000);
     });
-  };
-  
+};
+*/
+
