@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; // Adjust the URL to your backend API
+const API_URL = 'http://localhost:5000/api'; 
 
 export const getExercisesByBodyPart = async (bodyPart: string) => {
     try {

@@ -49,8 +49,8 @@ const MuscleGroupMap: React.FC = () => {
                     <div>
                         <h2 className="text-lg font-semibold mb-2">How to Use the Muscle Map</h2>
                         <ul className="list-disc list-inside text-sm">
-                            <li>Hover over a muscle group to highlight it.</li>
-                            <li>Click on a muscle group to view exercises for that muscle.</li>
+                            <li>Hover over a muscle  to highlight it.</li>
+                            <li>Click on a muscle to view exercises for that muscle.</li>
                         </ul>
                     </div>
                 </div>

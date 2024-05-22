@@ -26,23 +26,27 @@ const Exercises: React.FC = () => {
       });
   }, [muscleGroup]);
 
-
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
+
+  const getEmbedUrl = (url: string) => {
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get('v');
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
 
   return (
     exercise ? (
       <div className="exercise-container p-4">
         <h1 className="text-2xl font-bold mb-4">{exercise.muscleName} Exercise</h1>
         <div className="video-container mb-4">
-          <iframe 
-            width="560" 
-            height="315" 
-            src={exercise.videoUrl.replace("watch?v=", "embed/")} 
-            title="YouTube video player" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          <iframe
+            width="560"
+            height="315"
+            src={getEmbedUrl(exercise.videoUrl)}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </div>
