@@ -9,7 +9,7 @@ const AppRoutes: React.FC = () => (
         <Routes>
             <Route path="/" element={<App />}>
                 <Route index element={<MuscleGroupMap />} />
-                <Route path="exercises/:bodyPart" element={<Exercises />} />
+                <Route path="/exercises/:muscleGroup" element={<Exercises />} />
             </Route>
         </Routes>
     </Router>
