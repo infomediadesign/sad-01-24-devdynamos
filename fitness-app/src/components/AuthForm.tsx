@@ -43,7 +43,7 @@ const AuthForm: React.FC = () => {
         localStorage.setItem('token', response.token);
       }
       setTimeout(() => {
-        window.location.href = '/home';
+        window.location.href = '/dashboard';
       }, 2000);
     } catch (error: any) {
       setMessage(error.message);
