@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios from 'axios';
+import { authenticateUser } from '../services/authService';
 
 interface FormData {
   username: string;
@@ -37,17 +37,16 @@ const AuthForm: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post(`http://127.0.0.1:5000${endpoint}`, formData);
-      setMessage(response.data.message || 'Success');
-      if (isLogin && response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      const response = await authenticateUser(endpoint, formData);
+      setMessage(response.message || 'Success');
+      if (isLogin && response.token) {
+        localStorage.setItem('token', response.token);
       }
       setTimeout(() => {
         window.location.href = '/home';
       }, 2000);
     } catch (error: any) {
-      const errorMessage = error.response ? (error.response.data.error || 'Something went wrong') : 'Network error';
-      setMessage(errorMessage);
+      setMessage(error.message);
     } finally {
       setIsLoading(false);
     }
