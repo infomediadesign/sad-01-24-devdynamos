@@ -1,10 +1,12 @@
 // src/components/HomePage.tsx
-
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import Footer from './common/Footer'; // Import the Footer component
+import Footer from './common/Footer';
+import AuthContext from './AuthContext'; // Assume AuthContext is used to manage authentication state
 
 const HomePage: React.FC = () => {
+    const { isAuthenticated } = useContext(AuthContext);
+
     return (
         <div>
             <div className="home-page h-screen bg-cover bg-center" style={{ backgroundImage: 'url(https://media.istockphoto.com/id/1335253635/video/exercise-for-the-body-keeping-fit-for-health-young-women-fitness-and-exercise-training.jpg?s=640x640&k=20&c=e0C4zJ-x5_UfbbtxSnGQ-ZtNA7oF_XhUfoQCBODQXKM=)' }}>
@@ -12,9 +14,13 @@ const HomePage: React.FC = () => {
                     <div className="text-center text-white p-8 rounded-lg">
                         <h1 className="text-5xl mb-4">Welcome to the Fitness Tracker</h1>
                         <p className="text-xl mb-8">Your journey to a healthier life starts here. Track your workouts, monitor your progress, and stay motivated.</p>
-                        <Link to="/login" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">
-                            Login
-                        </Link>
+                        {!isAuthenticated && (
+                            <div>
+                                <Link to="/login" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">
+                                    Login
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
