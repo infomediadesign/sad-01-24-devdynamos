@@ -47,6 +47,8 @@
     ]
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.41",
+    "@types/react-chartjs-2": "^2.5.7",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "postcss-cli": "^11.0.0",
