@@ -1,16 +1,19 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { authenticateUser } from '../services/authService';
 
-interface FormData {
+interface LoginData {
   username: string;
   password: string;
+}
+
+interface RegistrationData extends LoginData {
   email: string;
   age: string;
 }
 
 const AuthForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegistrationData>({
     username: '',
     password: '',
     email: '',
@@ -37,7 +40,9 @@ const AuthForm: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await authenticateUser(endpoint, formData);
+      const responseData = isLogin ? await authenticateUser(endpoint, formData) : await authenticateUser(endpoint, { username: formData.username, password: formData.password });
+      const response = responseData as { message?: string, token?: string };
+
       setMessage(response.message || 'Success');
       if (isLogin && response.token) {
         localStorage.setItem('token', response.token);
