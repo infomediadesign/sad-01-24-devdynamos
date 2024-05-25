@@ -115,6 +115,11 @@ def login():
     else:
         return jsonify({"error": "Invalid username or password"}), 400
     
+# Import the calories_tracker routes
+from calories_tracker import init_calories_routes
+
+# Initialize calories routes with app and mongo
+init_calories_routes(app, mongo)
 
 if __name__ == '__main__':
     app.run(debug=True)
