@@ -39,9 +39,10 @@ def get_exercises_by_body_part(body_part):
     print("BODY_PART:: " , str(body_part_id))
     exercises = list(exercises_collection.find({'bodyPart_ref' : str(body_part_id)}))
     
-    # for exercise in exercises:
-    #     exercise['_id'] = str(exercise['_id'])
-    #     exercise['bodyPartId'] = str(exercise['bodyPartId'])
+     # Convert ObjectId to string for each exercise
+    for exercise in exercises:
+        exercise['_id'] = str(exercise['_id'])
+        exercise['bodyPart_ref'] = str(exercise['bodyPart_ref'])
     print("EXCERCISES ::: ", exercises)
 
     return jsonify(exercises), 200
