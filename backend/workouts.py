@@ -4,7 +4,7 @@ from flasgger import Swagger
 from flask_cors import CORS
 from bson.objectid import ObjectId
 from config import Config
-import bcrypt, jwt, datetime, re
+import jwt
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -26,6 +26,7 @@ def authenticate():
         token = token.split('Bearer ')[1]  # Extract token value without Bearer keyword
         try:
             payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+            print("PAYLOAD ::", payload)
             g.user = payload  # Store user data in Flask's global context
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token has expired"}), 401
@@ -58,16 +59,12 @@ def get_exercises_by_body_part(body_part):
     body_part_document = body_parts_collection.find_one({'name': body_part})
     if not body_part_document:
         return jsonify({"error": "Body part not found"}), 404
-    
-    print(g.user)
 
     body_part_id = body_part_document['_id']
-    print("BODY PART:::", body_part_id)
     exercises = list(exercises_collection.find({'bodyPart_ref': str(body_part_id)}))
     for exercise in exercises:
         exercise['_id'] = str(exercise['_id'])
         exercise['bodyPart_ref'] = str(exercise['bodyPart_ref'])
-    print("EXCERCISE :::", exercises)    
 
     return jsonify(exercises), 200
 
