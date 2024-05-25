@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, g
 from flask_pymongo import PyMongo
-from flasgger import Swagger
+from flasgger import Swagger, swag_from
 from flask_cors import CORS
 from bson.objectid import ObjectId
 from config import Config
@@ -13,7 +13,37 @@ mongo = PyMongo(app)
 body_parts_collection = mongo.db.bodyParts
 exercises_collection = mongo.db.excercises
 
-swagger = Swagger(app)
+# Swagger configuration
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Exercise API",
+        "description": "API to get exercises by body part.",
+        "version": "1.0.0"
+    },
+    "host": "localhost:5000",  # Change this to your actual API host
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: 'Bearer 12345abcdef'"
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+}
+
+swagger = Swagger(app, template=swagger_template)
+
 CORS(app)  # Enable CORS for all routes
 
 # Authentication middleware
@@ -36,23 +66,35 @@ def authenticate():
 
 # Protected endpoint - Requires authentication
 @app.route('/exercises/<string:body_part>', methods=['GET'])
+@swag_from({
+    "tags": ["Exercises"],
+    "parameters": [
+        {
+            "name": "body_part",
+            "in": "path",
+            "type": "string",
+            "required": True,
+            "description": "The name of the body part."
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "A list of exercises for the specified body part."
+        },
+        "401": {
+            "description": "Unauthorized access if token is missing or invalid."
+        },
+        "404": {
+            "description": "Body part not found."
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+})
 def get_exercises_by_body_part(body_part):
-    """Get exercises by body part.
-    ---
-    parameters:
-      - name: body_part
-        in: path
-        type: string
-        required: true
-        description: The name of the body part.
-    responses:
-      200:
-        description: A list of exercises for the specified body part.
-      401:
-        description: Unauthorized access if token is missing or invalid.
-      404:
-        description: Body part not found.
-    """
     if not hasattr(g, 'user'):
         return jsonify({"error": "Unauthorized access"}), 401
 
