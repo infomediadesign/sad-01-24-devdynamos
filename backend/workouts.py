@@ -38,8 +38,10 @@ def get_exercises_by_body_part(body_part):
     body_part_id = body_part_document['_id']
     print("BODY_PART:: " , str(body_part_id))
     exercises = list(exercises_collection.find({'bodyPart_ref' : str(body_part_id)}))
-
-
+    
+    # for exercise in exercises:
+    #     exercise['_id'] = str(exercise['_id'])
+    #     exercise['bodyPartId'] = str(exercise['bodyPartId'])
     print("EXCERCISES ::: ", exercises)
 
     return jsonify(exercises), 200
