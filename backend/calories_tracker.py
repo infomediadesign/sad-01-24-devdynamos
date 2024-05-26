@@ -31,7 +31,7 @@ def init_calories_routes(app, mongo):
             return f(*args, **kwargs)
         return decorated_function
 
-    @calories_bp.route('/set_goal', methods=['POST'])
+    @calories_bp.route('/set_caloriesgoal', methods=['POST'])
     @auth_required
     def set_calorie_goal():
         data = request.get_json()
