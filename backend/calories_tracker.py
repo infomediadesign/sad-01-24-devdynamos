@@ -20,10 +20,26 @@ def init_calories_routes(app, mongo):
         if not user:
             return jsonify({"error": "Invalid username"}), 400
 
+        start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+        end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+        # Check for overlapping goals
+        overlapping_goal = calories_tracker_collection.find_one({
+            'username': username,
+            '$or': [
+                {'start_date': {'$lte': end_date_obj, '$gte': start_date_obj}},
+                {'end_date': {'$gte': start_date_obj, '$lte': end_date_obj}},
+                {'start_date': {'$lte': start_date_obj}, 'end_date': {'$gte': end_date_obj}}
+            ]
+        })
+
+        if overlapping_goal:
+            return jsonify({"error": "A goal already exists for the specified period"}), 400
+
         goal_data = {
             'username': username,
-            'start_date': start_date,
-            'end_date': end_date,
+            'start_date': start_date_obj,
+            'end_date': end_date_obj,
             'goal': goal,
             'activity': activity,
             'calories_burned': 0,
@@ -51,7 +67,7 @@ def init_calories_routes(app, mongo):
             return jsonify({"error": "No active goal for this period"}), 400
 
         existing_log = daily_calories_log_collection.find_one({'username': username, 'date': log_date})
-        
+
         if existing_log:
             # Update the goal's calories_burned by subtracting the old log and adding the new log
             new_calories_burned = goal['calories_burned'] - existing_log['calories'] + calories
@@ -72,7 +88,7 @@ def init_calories_routes(app, mongo):
             {'_id': goal['_id']},
             {'$set': {'calories_burned': new_calories_burned}}
         )
-        
+
         return jsonify({"message": "Calories logged successfully"}), 200
 
     @calories_bp.route('/progress', methods=['GET'])
