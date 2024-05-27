@@ -50,7 +50,7 @@ const AuthForm: React.FC = () => {
       setMessage(response.message || 'Success');
       if (isLogin && response.jwt_token) { // Update the key to "jwt_token"
         localStorage.setItem('token', response.jwt_token); // Update the key to "jwt_token"
-        navigate('/dashboard');
+        navigate(`/dashboard/${formData.username}`); // Redirect to dashboard with username in the URL
       }
     } catch (error: any) {
       setMessage(error.message);
