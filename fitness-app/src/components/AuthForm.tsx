@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { authenticateUser } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginData {
   username: string;
@@ -12,6 +13,8 @@ interface RegistrationData extends LoginData {
 }
 
 const AuthForm: React.FC = () => {
+  const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [formData, setFormData] = useState<RegistrationData>({
     username: '',
@@ -40,16 +43,15 @@ const AuthForm: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const responseData = isLogin ? await authenticateUser(endpoint, formData) : await authenticateUser(endpoint, { username: formData.username, password: formData.password });
-      const response = responseData as { message?: string, token?: string };
+      const responseData = await authenticateUser(endpoint, formData);
+      
+      const response = responseData as { message?: string, jwt_token?: string }; // Update the key to "jwt_token"
 
       setMessage(response.message || 'Success');
-      if (isLogin && response.token) {
-        localStorage.setItem('token', response.token);
+      if (isLogin && response.jwt_token) { // Update the key to "jwt_token"
+        localStorage.setItem('token', response.jwt_token); // Update the key to "jwt_token"
+        navigate('/dashboard');
       }
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 2000);
     } catch (error: any) {
       setMessage(error.message);
     } finally {
