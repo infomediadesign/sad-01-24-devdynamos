@@ -89,7 +89,11 @@ def init_calories_routes(app, mongo):
             {'$set': {'calories_burned': new_calories_burned}}
         )
 
-        return jsonify({"message": "Calories logged successfully"}), 200
+        message = "Calories logged successfully"
+        if new_calories_burned >= goal['goal']:
+            message += " and goal achieved!"
+
+        return jsonify({"message": message}), 200
 
     @calories_bp.route('/progress', methods=['GET'])
     def get_progress():
