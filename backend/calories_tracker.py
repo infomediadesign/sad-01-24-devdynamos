@@ -1,5 +1,11 @@
-from flask import Blueprint, request, jsonify
+from flask import Flask, Blueprint, request, jsonify, g
 import datetime
+import jwt
+from config import Config
+from functools import wraps
+
+app = Flask(__name__)
+app.config.from_object(Config)
 
 calories_bp = Blueprint('calories', __name__)
 
@@ -8,7 +14,25 @@ def init_calories_routes(app, mongo):
     calories_tracker_collection = mongo.db.calories_tracker
     daily_calories_log_collection = mongo.db.daily_calories_log
 
-    @calories_bp.route('/set_goal', methods=['POST'])
+    def auth_required(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            token = request.headers.get('Authorization')
+            if not token or not token.startswith('Bearer '):
+                return jsonify({"error": "Bearer token is missing"}), 401
+            token = token.split('Bearer ')[1]
+            try:
+                payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+                g.user = payload
+            except jwt.ExpiredSignatureError:
+                return jsonify({"error": "Token has expired"}), 401
+            except jwt.InvalidTokenError:
+                return jsonify({"error": "Invalid token"}), 401
+            return f(*args, **kwargs)
+        return decorated_function
+
+    @calories_bp.route('/set_caloriesgoal', methods=['POST'])
+    @auth_required
     def set_calorie_goal():
         data = request.get_json()
         username, start_date, end_date, goal, activity = data.get('username'), data.get('start_date'), data.get('end_date'), data.get('goal'), data.get('activity')
@@ -23,7 +47,6 @@ def init_calories_routes(app, mongo):
         start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
         end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').strftime('%Y-%m-%d')
 
-        # Check for overlapping goals
         overlapping_goal = calories_tracker_collection.find_one({
             'username': username,
             '$or': [
@@ -49,6 +72,7 @@ def init_calories_routes(app, mongo):
         return jsonify({"message": "Goal set successfully"}), 201
 
     @calories_bp.route('/log', methods=['POST'])
+    @auth_required
     def log_calories():
         data = request.get_json()
         username, date, calories = data.get('username'), data.get('date'), data.get('calories')
@@ -69,7 +93,6 @@ def init_calories_routes(app, mongo):
         existing_log = daily_calories_log_collection.find_one({'username': username, 'date': log_date})
 
         if existing_log:
-            # Update the goal's calories_burned by subtracting the old log and adding the new log
             new_calories_burned = goal['calories_burned'] - existing_log['calories'] + calories
             daily_calories_log_collection.update_one(
                 {'_id': existing_log['_id']},
@@ -92,6 +115,7 @@ def init_calories_routes(app, mongo):
         return jsonify({"message": "Calories logged successfully"}), 200
 
     @calories_bp.route('/progress', methods=['GET'])
+    @auth_required
     def get_progress():
         username = request.args.get('username')
         start_date = request.args.get('start_date')
@@ -129,6 +153,7 @@ def init_calories_routes(app, mongo):
         return jsonify(progress), 200
 
     @calories_bp.route('/calories_bydate', methods=['GET'])
+    @auth_required
     def get_calories_by_date():
         username = request.args.get('username')
         date = request.args.get('date')
@@ -156,3 +181,10 @@ def init_calories_routes(app, mongo):
         return jsonify({"username": username, "date": date, "calories": daily_log['calories']}), 200
 
     app.register_blueprint(calories_bp, url_prefix='/calories')
+
+if __name__ == "__main__":
+    from flask_pymongo import PyMongo
+    app.config["MONGO_URI"] = Config.MONGO_URI
+    mongo = PyMongo(app)
+    init_calories_routes(app, mongo)
+    app.run(debug=True)
