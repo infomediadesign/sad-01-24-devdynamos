@@ -45,15 +45,31 @@ def init_calories_routes(app, mongo):
         if not user:
             return jsonify({"error": "Invalid username"}), 400
 
-        start_date_obj = datetime.datetime.strptime(start_date, '%d-%m-%Y').strftime('%Y-%m-%d')
-        end_date_obj = datetime.datetime.strptime(end_date, '%d-%m-%Y').strftime('%Y-%m-%d')
+        try:
+            start_date_obj = datetime.datetime.strptime(start_date, '%d-%m-%Y')
+            end_date_obj = datetime.datetime.strptime(end_date, '%d-%m-%Y')
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use dd-mm-yyyy."}), 400
+
+        today = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        if start_date_obj < today:
+            return jsonify({"error": "Start date cannot be in the past"}), 400
+
+        if end_date_obj <= start_date_obj:
+            return jsonify({"error": "End date must be after the start date"}), 400
+
+        if (end_date_obj - start_date_obj).days != 6:
+            return jsonify({"error": "The goal period must be exactly 7 days"}), 400
+
+        start_date_str = start_date_obj.strftime('%Y-%m-%d')
+        end_date_str = end_date_obj.strftime('%Y-%m-%d')
 
         overlapping_goal = calories_tracker_collection.find_one({
             'username': username,
             '$or': [
-                {'start_date': {'$lte': end_date_obj, '$gte': start_date_obj}},
-                {'end_date': {'$gte': start_date_obj, '$lte': end_date_obj}},
-                {'start_date': {'$lte': start_date_obj}, 'end_date': {'$gte': end_date_obj}}
+                {'start_date': {'$lte': end_date_str, '$gte': start_date_str}},
+                {'end_date': {'$gte': start_date_str, '$lte': end_date_str}},
+                {'start_date': {'$lte': start_date_str}, 'end_date': {'$gte': end_date_str}}
             ]
         })
 
@@ -62,8 +78,8 @@ def init_calories_routes(app, mongo):
 
         goal_data = {
             'username': username,
-            'start_date': start_date_obj,
-            'end_date': end_date_obj,
+            'start_date': start_date_str,
+            'end_date': end_date_str,
             'goal': goal,
             'activity': activity,
             'calories_burned': 0,
@@ -185,7 +201,6 @@ def init_calories_routes(app, mongo):
             return jsonify({"error": "No calories logged for this date"}), 400
 
         return jsonify({"date": date, "calories": daily_log['calories']}), 200
-
 
     app.register_blueprint(calories_bp, url_prefix='/calories')
 
