@@ -4,15 +4,47 @@ import bcrypt, jwt, datetime, re
 from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
+from functools import wraps
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 mongo = PyMongo(app)
 users_collection = mongo.db.users
+blacklist_collection = mongo.db.token_blacklist
 
 
-swagger = Swagger(app)
+
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Exercise API",
+        "description": "API to get exercises by body part.",
+        "version": "1.0.0"
+    },
+    "host": "localhost:5000",  # Change this to your actual API host
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: 'Bearer 12345abcdef'"
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+}
+
+swagger = Swagger(app, template=swagger_template)
+
 CORS(app)  # Enable CORS for all routes
 
 @app.route('/registration', methods=['POST'])
@@ -115,11 +147,61 @@ def login():
     else:
         return jsonify({"error": "Invalid username or password"}), 400
     
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+            if blacklist_collection.find_one({"token": token}):
+                return jsonify({'message': 'Token has been blacklisted!'}), 401
+        except Exception as e:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+@app.route('/logout', methods=['POST'])
+@token_required
+def logout():
+    """Logout a user by blacklisting their token.
+    ---
+    responses:
+      200:
+        description: User logged out successfully.
+      400:
+        description: Error message if logout fails.
+    """
+    token = request.headers['Authorization'].split(" ")[1]
+    try:
+        blacklist_collection.insert_one({"token": token})
+        return jsonify({"message": "User logged out successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@app.route('/some_protected_route', methods=['GET'])
+@token_required
+def some_protected_route():
+    return jsonify({"message": "This is a protected route!"}), 200
+
+    
 # Import the calories_tracker routes
 from calories_tracker import init_calories_routes
 
 # Initialize calories routes with app and mongo
 init_calories_routes(app, mongo)
+
+# Import the workouts routes
+from workouts import init_workouts_routes
+
+# Initialize workouts routes with app and mongo
+init_workouts_routes(app, mongo)
 
 if __name__ == '__main__':
     app.run(debug=True)
