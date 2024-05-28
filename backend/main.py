@@ -203,5 +203,9 @@ from workouts import init_workouts_routes
 # Initialize workouts routes with app and mongo
 init_workouts_routes(app, mongo)
 
+from progressTracking import init_progress_routes
+
+init_progress_routes(app, mongo)
+
 if __name__ == '__main__':
     app.run(debug=True)
