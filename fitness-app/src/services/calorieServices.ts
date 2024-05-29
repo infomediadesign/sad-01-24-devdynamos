@@ -8,11 +8,10 @@ export const setCalorieGoal = async (goalData: any) => {
 };
 
 export const logCalories = async (username: string, date: string, calories: string) => {
-  return axios.post(`${API_BASE_URL}/log`, { params:{
+  return axios.post(`${API_BASE_URL}/log`, {
     username,
     date,
     calories,
-  }
   });
 };
 
