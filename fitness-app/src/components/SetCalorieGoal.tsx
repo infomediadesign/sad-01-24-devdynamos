@@ -1,6 +1,7 @@
 // src/components/SetCalorieGoal.tsx
 import React, { useState } from 'react';
-import {setCalorieGoal} from '../services/calorieServices';
+import { setCalorieGoal } from '../services/calorieServices';
+import moment from 'moment';
 
 const SetCalorieGoal: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -20,8 +21,16 @@ const SetCalorieGoal: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Format the dates to dd-mm-yyyy
+    const formattedFormData = {
+      ...formData,
+      start_date: moment(formData.start_date).format('DD-MM-YYYY'),
+      end_date: moment(formData.end_date).format('DD-MM-YYYY')
+    };
+
     try {
-      await setCalorieGoal(formData);
+      await setCalorieGoal(formattedFormData);
       alert('Goal set successfully');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -33,7 +42,6 @@ const SetCalorieGoal: React.FC = () => {
       }
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit}>
