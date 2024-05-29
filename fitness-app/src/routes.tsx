@@ -9,6 +9,10 @@ import ProgressChart from './components/ProgressChart';
 import HomePage from './components/HomePage';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import LogCalories from './components/LogCalories';
+import SetCalorieGoal from './components/SetCalorieGoal';
+import ViewProgress from './components/ViewProgress';
 
 const AppRoutes: React.FC = () => (
     <Router>
@@ -16,7 +20,12 @@ const AppRoutes: React.FC = () => (
             <Route path="/" element={<App />} />
             <Route path="home" element={<HomePage />} />
             <Route path="login" element={<AuthForm />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard/:username" element={<Dashboard />} />
+            </Route>
+            <Route path="/log" element={<LogCalories />} />
+            <Route path="/set_caloriesgoal" element={<SetCalorieGoal />} />
+            { <Route path="/progress" element={<ViewProgress />} /> /*view calorie goal progress */}
             <Route path="muscle-groups" element={<MuscleGroupMap />} /> {/* Assuming this is your index route */}
             <Route path="exercises/:muscleGroup" element={<Exercises />} />
             <Route path="set-goal" element={<SetGoal />} />
