@@ -86,7 +86,7 @@ def init_progress_routes(app, mongo):
             'end_date': end_date_obj,
             'goal': goal,
             'activity': activity,
-            'progress': [],
+            'progresses': [],
             'created_at': datetime.datetime.utcnow().strftime('%Y-%m-%d')
         }
         progress_tracker_collection.insert_one(goal_data)
@@ -108,7 +108,6 @@ def init_progress_routes(app, mongo):
                 'schema': {
                     'type': 'object',
                     'properties': {
-                        'username': {'type': 'string'},
                         'date': {'type': 'string', 'format': 'date'},
                         'progress': {'type': 'number'}
                     },
@@ -128,19 +127,41 @@ def init_progress_routes(app, mongo):
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
+        
 
         log_date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
         goal = progress_tracker_collection.find_one({'username': username, 'start_date': {'$lte': log_date}, 'end_date': {'$gte': log_date}})
 
+
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
 
-        new_progress_entry = {'date': log_date, 'progress': progress_value}
-        
-        progress_tracker_collection.update_one(
-            {'_id': goal['_id']},
-            {'$push': {'progress': new_progress_entry}}
-        )
+        if len(goal["progresses"]) == 0:
+            new_progress_entry = {'date': log_date, 'progress': progress_value}
+            progress_tracker_collection.update_one(
+                {'_id': goal['_id']},
+                {'$push': {'progresses': new_progress_entry}}
+            )
+        else:
+            for progress in  goal["progresses"]:
+                if date == progress["date"]:
+                    progress_tracker_collection.update_one(
+                        {
+                            '_id': goal['_id'],
+                            'progresses.date': log_date
+                        },
+                        {
+                            '$inc': {'progresses.$.progress': progress_value}
+                        }
+                    )
+
+                else : 
+                    new_progress_entry = {'date': log_date, 'progress': progress_value}
+
+                    progress_tracker_collection.update_one(
+                        {'_id': goal['_id']},
+                        {'$push': {'progresses': new_progress_entry}}
+                    )
 
         message = "Progress logged successfully"
         if progress_value >= goal['goal']:

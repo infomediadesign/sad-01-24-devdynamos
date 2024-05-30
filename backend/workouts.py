@@ -10,7 +10,7 @@ workouts_bp = Blueprint('workouts', __name__)
 
 def init_workouts_routes(app, mongo):
     body_parts_collection = mongo.db.bodyParts
-    exercises_collection = mongo.db.exercises
+    exercises_collection = mongo.db.excercises
 
     # Authentication middleware
     @app.before_request
@@ -22,7 +22,6 @@ def init_workouts_routes(app, mongo):
             token = token.split('Bearer ')[1]  # Extract token value without Bearer keyword
             try:
                 payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-                print("PAYLOAD ::", payload)
                 g.user = payload  # Store user data in Flask's global context
             except jwt.ExpiredSignatureError:
                 return jsonify({"error": "Token has expired"}), 401
