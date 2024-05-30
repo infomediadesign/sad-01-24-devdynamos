@@ -1,6 +1,7 @@
 // src/components/ViewProgress.tsx
 import React, { useState } from 'react';
 import { getProgress } from '../services/calorieServices';
+import moment from 'moment';
 
 const ViewProgress: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -20,8 +21,13 @@ const ViewProgress: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Format the dates to dd-mm-yyyy
+    const formattedStartDate = moment(formData.start_date).format('DD-MM-YYYY');
+    const formattedEndDate = moment(formData.end_date).format('DD-MM-YYYY');
+
     try {
-      const response = await getProgress(formData.username, formData.start_date, formData.end_date);
+      const response = await getProgress(formData.username, formattedStartDate, formattedEndDate);
       setProgress(response.data);
     } catch (error) {
       alert('Error fetching progress');
