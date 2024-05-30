@@ -4,6 +4,7 @@ import bcrypt, jwt, datetime, re
 from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
+from flasgger import swag_from
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,7 +13,33 @@ mongo = PyMongo(app)
 users_collection = mongo.db.users
 
 
-swagger = Swagger(app)
+swagger_calories_tracker = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Calories Tracker API",
+        "description": "API for calories tracker",
+        "version": "1.0.0"
+    },
+    "host": "localhost:5000",  # Change this to your actual API host
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter your bearer token in the format 'Bearer {token}'"
+        }
+    },
+    "security": [{"BearerAuth": []}]
+}
+
+swagger = Swagger(app, template=swagger_calories_tracker)
+
+
 CORS(app)  # Enable CORS for all routes
 
 @app.route('/registration', methods=['POST'])

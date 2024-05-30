@@ -3,6 +3,7 @@ import datetime
 import jwt
 from config import Config
 from functools import wraps
+from flasgger import swag_from
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -33,6 +34,31 @@ def init_calories_routes(app, mongo):
 
     @calories_bp.route('/set_caloriesgoal', methods=['POST'])
     @auth_required
+    @swag_from({
+        'tags': ['Calories Tracker'],
+        'responses': {
+            201: {'description': 'Goal set successfully'},
+            400: {'description': 'All fields are required or Invalid username or A goal already exists for the specified period'},
+            401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
+        },
+        'parameters': [
+            {
+                'name': 'body',
+                'in': 'body',
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'start_date': {'type': 'string', 'format': 'date'},
+                        'end_date': {'type': 'string', 'format': 'date'},
+                        'goal': {'type': 'integer'},
+                        'activity': {'type': 'string'}
+                    },
+                    'required': ['start_date', 'end_date', 'goal', 'activity']
+                }
+            }
+        ],
+        'security': [{'BearerAuth': []}]
+    })
     def set_calorie_goal():
         data = request.get_json()
         start_date, end_date, goal, activity = data.get('start_date'), data.get('end_date'), data.get('goal'), data.get('activity')
@@ -90,6 +116,43 @@ def init_calories_routes(app, mongo):
 
     @calories_bp.route('/log', methods=['POST'])
     @auth_required
+    @swag_from({
+        'tags': ['Calories Tracker'],
+        'summary': 'Log Calories',
+        'description': 'Log the calories consumed for a specific date and update the calorie goal progress.',
+        'parameters': [
+            {
+                'name': 'body',
+                'in': 'body',
+                'required': True,
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'date': {'type': 'string', 'format': 'date', 'description': 'Date of the logged calories (dd-mm-yyyy)'},
+                        'calories': {'type': 'number', 'description': 'Number of calories consumed for the date'}
+                    }
+                }
+            }
+        ],
+        'responses': {
+            200: {
+                'description': 'Calories logged successfully. If the goal is achieved, the message includes goal achievement.',
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {'type': 'string', 'description': 'Success message, may include goal achievement notification'}
+                    }
+                }
+            },
+            400: {
+                'description': 'Bad request or invalid data provided. Error message will be provided in the response.'
+            },
+            401: {
+                'description': 'Bearer token is missing or Token has expired or Invalid token. Authentication required.'
+            }
+        },
+        'security': [{'BearerAuth': []}]
+    })
     def log_calories():
         data = request.get_json()
         date, calories = data.get('date'), data.get('calories')
@@ -121,8 +184,7 @@ def init_calories_routes(app, mongo):
             daily_calories_log_collection.insert_one({
                 'username': username,
                 'date': log_date,
-                'calories': calories,
-                'created_at': datetime.datetime.utcnow().strftime('%Y-%m-%d')
+                'calories': calories
             })
 
         calories_tracker_collection.update_one(
@@ -138,6 +200,51 @@ def init_calories_routes(app, mongo):
 
     @calories_bp.route('/progress', methods=['GET'])
     @auth_required
+    @swag_from({
+        'tags': ['Calories Tracker'],
+        'summary': 'Get Progress',
+        'description': 'Retrieve progress towards the calorie goal for a specified period.',
+        'parameters': [
+            {
+                'name': 'start_date',
+                'in': 'query',
+                'required': True,
+                'type': 'string',
+                'format': 'date',
+                'description': 'Start date of the period to retrieve progress (dd-mm-yyyy)'
+            },
+            {
+                'name': 'end_date',
+                'in': 'query',
+                'required': True,
+                'type': 'string',
+                'format': 'date',
+                'description': 'End date of the period to retrieve progress (dd-mm-yyyy)'
+            }
+        ],
+        'responses': {
+            200: {
+                'description': 'Progress retrieved successfully. Returns progress details for the specified period.',
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'goal': {'type': 'number', 'description': 'Target calorie goal for the period'},
+                        'calories_burned': {'type': 'number', 'description': 'Total calories burned for the period'},
+                        'activity': {'type': 'string', 'description': 'Description of the activity related to the goal'},
+                        'start_date': {'type': 'string', 'format': 'date', 'description': 'Start date of the period'},
+                        'end_date': {'type': 'string', 'format': 'date', 'description': 'End date of the period'}
+                    }
+                }
+            },
+            400: {
+                'description': 'Bad request or invalid data provided. Error message will be provided in the response.'
+            },
+            401: {
+                'description': 'Bearer token is missing or Token has expired or Invalid token. Authentication required.'
+            }
+        },
+        'security': [{'BearerAuth': []}]
+    })
     def get_progress():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
@@ -176,6 +283,40 @@ def init_calories_routes(app, mongo):
 
     @calories_bp.route('/calories_bydate', methods=['GET'])
     @auth_required
+    @swag_from({
+        'tags': ['Calories Tracker'],
+        'summary': 'Get Calories by Date',
+        'description': 'Retrieve the number of calories logged for a specific date.',
+        'parameters': [
+            {
+                'name': 'date',
+                'in': 'query',
+                'required': True,
+                'type': 'string',
+                'format': 'date',
+                'description': 'Date for which to retrieve logged calories (dd-mm-yyyy)'
+            }
+        ],
+        'responses': {
+            200: {
+                'description': 'Calories retrieved successfully. Returns the number of calories logged for the specified date.',
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'date': {'type': 'string', 'format': 'date', 'description': 'Date for which calories are retrieved'},
+                        'calories': {'type': 'number', 'description': 'Number of calories logged for the specified date'}
+                    }
+                }
+            },
+            400: {
+                'description': 'Bad request or invalid data provided. Error message will be provided in the response.'
+            },
+            401: {
+                'description': 'Bearer token is missing or Token has expired or Invalid token. Authentication required.'
+            }
+        },
+        'security': [{'BearerAuth': []}]
+    })
     def get_calories_by_date():
         date = request.args.get('date')
 
