@@ -92,7 +92,7 @@ def init_progress_routes(app, mongo):
         progress_tracker_collection.insert_one(goal_data)
         return jsonify({"message": "Goal set successfully"}), 201
 
-    @progress_bp.route('/log', methods=['POST'])
+    @progress_bp.route('/progress_log', methods=['POST'])
     @auth_required
     @swag_from({
         'tags': ['Progress'],
@@ -142,9 +142,13 @@ def init_progress_routes(app, mongo):
             {'$push': {'progress': new_progress_entry}}
         )
 
-        return jsonify({"message": "Progress logged successfully"}), 200
+        message = "Progress logged successfully"
+        if progress_value >= goal['goal']:
+            message += " and goal achieved!"
 
-    @progress_bp.route('/progress', methods=['GET'])
+        return jsonify({"message": message}), 200
+
+    @progress_bp.route('/achieved', methods=['GET'])
     @auth_required
     @swag_from({
         'tags': ['Progress'],
