@@ -166,6 +166,52 @@ def login():
     else:
         return jsonify({"error": "Invalid username or password"}), 400
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+            session_data = sessions_collection.find_one({"username": data['username'], "tokens": token})
+            if not session_data:
+                return jsonify({'message': 'Token is invalid or session not found!'}), 401
+            request.user = data['username']
+        except Exception as e:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+@app.route('/logout', methods=['POST'])
+@token_required
+def logout():
+    """Logout a user by deleting their session.
+    ---
+    responses:
+      200:
+        description: User logged out successfully.
+      400:
+        description: Error message if logout fails.
+    """
+    token = request.headers['Authorization'].split(" ")[1]
+    try:
+        # Remove the specific token from the user's session document
+        sessions_collection.update_one(
+            {"username": request.user},
+            {"$pull": {"tokens": token}}
+        )
+        # Optionally, remove the entire document if no tokens are left
+        sessions_collection.delete_one({"username": request.user, "tokens": {"$size": 0}})
+        return jsonify({"message": "User logged out successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True)
