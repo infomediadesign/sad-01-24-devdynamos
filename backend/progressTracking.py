@@ -42,13 +42,12 @@ def init_progress_routes(app, mongo):
                 'schema': {
                     'type': 'object',
                     'properties': {
-                        'username': {'type': 'string'},
                         'start_date': {'type': 'string', 'format': 'date'},
                         'end_date': {'type': 'string', 'format': 'date'},
                         'goal': {'type': 'string'},
                         'activity': {'type': 'string'}
                     },
-                    'required': ['username', 'start_date', 'end_date', 'goal', 'activity']
+                    'required': ['start_date', 'end_date', 'goal', 'activity']
                 }
             }
         ],
@@ -62,7 +61,6 @@ def init_progress_routes(app, mongo):
             return jsonify({"error": "All fields are required"}), 400
 
         username = g.user['username']
-        print("user::", username)
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -113,7 +111,7 @@ def init_progress_routes(app, mongo):
                         'date': {'type': 'string', 'format': 'date'},
                         'progress': {'type': 'number'}
                     },
-                    'required': ['username', 'date', 'progress']
+                    'required': ['date', 'progress']
                 }
             }
         ],
@@ -126,19 +124,17 @@ def init_progress_routes(app, mongo):
         if not date or not progress_value:
             return jsonify({"error": "All fields are required"}), 400
 
-        username = g.user['username'] 
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
-        
 
         log_date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
         goal = progress_tracker_collection.find_one({'username': username, 'start_date': {'$lte': log_date}, 'end_date': {'$gte': log_date}})
 
-
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
-        
+
         result = progress_tracker_collection.update_one(
             {"_id": goal['_id'], "progresses.date": log_date},
             {"$inc": {"progresses.$.progress": progress_value}}
@@ -163,15 +159,10 @@ def init_progress_routes(app, mongo):
         'tags': ['Progress'],
         'responses': {
             200: {'description': 'Success'},
-            400: {'description': 'Username, start_date, and end_date are required or Invalid username or No active goal for this period'},
+            400: {'description': 'Invalid username or No active goal'},
             401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
         },
-        'parameters': [
-            {'name': 'username', 'in': 'query', 'type': 'string', 'required': True},
-            {'name': 'start_date', 'in': 'query', 'type': 'string', 'format': 'date', 'required': True},
-            {'name': 'end_date', 'in': 'query', 'type': 'string', 'format': 'date', 'required': True}
-        ],
-        'security': [{'Bearer': []}]
+        'parameters': []
     })
     def get_progress():
         username = g.user['username']
@@ -179,37 +170,25 @@ def init_progress_routes(app, mongo):
         if not user:
             return jsonify({"error": "Invalid username"}), 400
 
-        # try:
-        #     start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
-        #     end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').strftime('%Y-%m-%d')
-        # except ValueError:
-        #     return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
-
-        goals = progress_tracker_collection.find({
-            'username': username
-            
-        })
+        goals = progress_tracker_collection.find({'username': username})
 
         if not goals:
-            return jsonify({"error": "No active goal "}), 400
-        
-        print("GOAL::", goals)
+            return jsonify({"error": "No active goal"}), 400
 
         goalsResult = []
         for goal in goals:
-            # Summing the progress values in the 'progresses' array
             total_progress = sum(entry['progress'] for entry in goal['progresses'])
 
             progress_data = {
                 'goal': goal['goal'],
                 'activity': goal['activity'],
-                'progress': total_progress,  # Use the total progress instead of the key 'progress'
+                'progress': total_progress,
                 'start_date': goal['start_date'],
                 'end_date': goal['end_date']
             }
             goalsResult.append(progress_data)
-        
-        return jsonify(goalsResult), 200    
+
+        return jsonify(goalsResult), 200
 
     @progress_bp.route('/progress_bydate', methods=['GET'])
     @auth_required
@@ -217,11 +196,10 @@ def init_progress_routes(app, mongo):
         'tags': ['Progress'],
         'responses': {
             200: {'description': 'Success'},
-            400: {'description': 'Username and date are required or Invalid username or No active goal for this period or No progress logged for this date'},
+            400: {'description': 'Date is required or Invalid username or No active goal for this period or No progress logged for this date'},
             401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
         },
         'parameters': [
-            {'name': 'username', 'in': 'query', 'type': 'string', 'required': True},
             {'name': 'date', 'in': 'query', 'type': 'string', 'format': 'date', 'required': True}
         ],
         'security': [{'Bearer': []}]
