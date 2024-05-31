@@ -5,6 +5,9 @@ from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
 from functools import wraps
+from calories_tracker import init_calories_routes
+from workouts import init_workouts_routes
+from progressTracking import init_progress_routes
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,6 +15,11 @@ app.config.from_object(Config)
 mongo = PyMongo(app)
 users_collection = mongo.db.users
 blacklist_collection = mongo.db.token_blacklist
+sessions_collection = mongo.db.sessions
+
+init_calories_routes(app, mongo)
+init_workouts_routes(app, mongo)
+init_progress_routes(app, mongo)
 
 swagger_template = {
     "swagger": "2.0",
@@ -137,7 +145,22 @@ def login():
         return jsonify({"error": "Invalid username or password"}), 400
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+
+        session_data = sessions_collection.find_one({'username': username})
+        if session_data:
+            # Append the new token to the existing array of tokens
+            sessions_collection.update_one(
+                {'username': username},
+                {'$push': {'tokens': token}}
+            )
+        else:
+            # Create a new session document with the token
+            session_data = {
+                "username": username,
+                "tokens": [token]
+            }
+            sessions_collection.insert_one(session_data)
         return jsonify({"jwt_token": token}), 200
 
     else:
@@ -154,8 +177,10 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
-            if blacklist_collection.find_one({"token": token}):
-                return jsonify({'message': 'Token has been blacklisted!'}), 401
+            session_data = sessions_collection.find_one({"username": data['username'], "tokens": token})
+            if not session_data:
+                return jsonify({'message': 'Token is invalid or session not found!'}), 401
+            request.user = data['username']
         except Exception as e:
             return jsonify({'message': 'Token is invalid!'}), 401
 
@@ -166,7 +191,7 @@ def token_required(f):
 @app.route('/logout', methods=['POST'])
 @token_required
 def logout():
-    """Logout a user by blacklisting their token.
+    """Logout a user by deleting their session.
     ---
     responses:
       200:
@@ -176,33 +201,17 @@ def logout():
     """
     token = request.headers['Authorization'].split(" ")[1]
     try:
-        blacklist_collection.insert_one({"token": token})
+        # Remove the specific token from the user's session document
+        sessions_collection.update_one(
+            {"username": request.user},
+            {"$pull": {"tokens": token}}
+        )
+        # Optionally, remove the entire document if no tokens are left
+        sessions_collection.delete_one({"username": request.user})
         return jsonify({"message": "User logged out successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/some_protected_route', methods=['GET'])
-@token_required
-def some_protected_route():
-    return jsonify({"message": "This is a protected route!"}), 200
-
-# Import the calories_tracker routes
-from calories_tracker import init_calories_routes
-
-# Initialize calories routes with app and mongo
-init_calories_routes(app, mongo)
-
-# Import the workouts routes
-from workouts import init_workouts_routes
-
-# Initialize workouts routes with app and mongo
-init_workouts_routes(app, mongo)
-
-# Import the progress tracking routes
-from progressTracking import init_progress_routes
-
-# Initialize progress routes with app and mongo
-init_progress_routes(app, mongo)
 
 if __name__ == '__main__':
     app.run(debug=True)
