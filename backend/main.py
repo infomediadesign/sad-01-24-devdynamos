@@ -207,7 +207,7 @@ def logout():
             {"$pull": {"tokens": token}}
         )
         # Optionally, remove the entire document if no tokens are left
-        sessions_collection.delete_one({"username": request.user, "tokens": {"$size": 0}})
+        sessions_collection.delete_one({"username": request.user})
         return jsonify({"message": "User logged out successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
