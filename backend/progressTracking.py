@@ -212,14 +212,17 @@ def init_progress_routes(app, mongo):
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
 
+        # Summing the progress values in the 'progresses' array
+        total_progress = sum(entry['progress'] for entry in goal['progresses'])
+
         progress_data = {
             'goal': goal['goal'],
             'activity': goal['activity'],
-            'progress': goal['progress'],
+            'progress': total_progress,  # Use the total progress instead of the key 'progress'
             'start_date': goal['start_date'],
             'end_date': goal['end_date']
         }
-        return jsonify(progress_data), 200
+        return jsonify(progress_data), 200    
 
     @progress_bp.route('/progress_bydate', methods=['GET'])
     @auth_required
@@ -257,7 +260,7 @@ def init_progress_routes(app, mongo):
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
 
-        daily_log = next((entry for entry in goal['progress'] if entry['date'] == log_date), None)
+        daily_log = next((entry for entry in goal['progresses'] if entry['date'] == log_date), None)
 
         if not daily_log:
             return jsonify({"error": "No progress logged for this date"}), 400

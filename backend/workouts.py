@@ -67,13 +67,10 @@ def init_workouts_routes(app, mongo):
             return jsonify({"error": "Body part not found"}), 404
 
         body_part_id = body_part_document['_id']
-        print(body_part_id)
         exercises = list(exercises_collection.find({'bodyPart_ref': str(body_part_id)}))
         for exercise in exercises:
             exercise['_id'] = str(exercise['_id'])
-            exercise['bodyPart_ref'] = str(exercise['bodyPart_ref'])
-
-        print(exercises)    
+            exercise['bodyPart_ref'] = str(exercise['bodyPart_ref'])   
 
         return jsonify(exercises), 200
 
