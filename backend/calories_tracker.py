@@ -171,22 +171,24 @@ def init_calories_routes(app, mongo):
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
 
-        existing_log = daily_calories_log_collection.find_one({'username': username, 'date': log_date})
+        # Check if there's already an entry for the date
+        existing_log = next((entry for entry in goal.get('calories_logs', []) if entry['date'] == log_date), None)
 
         if existing_log:
             new_calories_burned = goal['calories_burned'] - existing_log['calories'] + calories
-            daily_calories_log_collection.update_one(
-                {'_id': existing_log['_id']},
-                {'$set': {'calories': calories}}
+            calories_tracker_collection.update_one(
+                {'_id': goal['_id'], 'calories_logs.date': log_date},
+                {'$set': {'calories_logs.$.calories': calories}}
             )
         else:
             new_calories_burned = goal['calories_burned'] + calories
-            daily_calories_log_collection.insert_one({
-                'username': username,
-                'date': log_date,
-                'calories': calories
-            })
+            new_log_entry = {'date': log_date, 'calories': calories}
+            calories_tracker_collection.update_one(
+                {'_id': goal['_id']},
+                {'$push': {'calories_logs': new_log_entry}}
+            )
 
+        # Update the total calories burned
         calories_tracker_collection.update_one(
             {'_id': goal['_id']},
             {'$set': {'calories_burned': new_calories_burned}}
@@ -194,7 +196,7 @@ def init_calories_routes(app, mongo):
 
         message = "Calories logged successfully"
         if new_calories_burned >= goal['goal']:
-            message += " and goal achieved!"
+            message += " & The goal is achieved, Congratulations!"
 
         return jsonify({"message": message}), 200
 
@@ -329,20 +331,26 @@ def init_calories_routes(app, mongo):
             return jsonify({"error": "Invalid username"}), 400
 
         try:
-            date_obj = datetime.datetime.strptime(date, '%d-%m-%Y').strftime('%Y-%m-%d')
+            log_date = datetime.datetime.strptime(date, '%d-%m-%Y').strftime('%Y-%m-%d')
         except ValueError:
             return jsonify({"error": "Invalid date format. Use dd-mm-yyyy."}), 400
 
-        daily_log = daily_calories_log_collection.find_one({
+        goal = calories_tracker_collection.find_one({
             'username': username,
-            'date': date_obj
+            'start_date': {'$lte': log_date},
+            'end_date': {'$gte': log_date}
         })
+
+        if not goal:
+            return jsonify({"error": "No active goal for this period"}), 400
+
+        daily_log = next((entry for entry in goal.get('calories_logs', []) if entry['date'] == log_date), None)
 
         if not daily_log:
             return jsonify({"error": "No calories logged for this date"}), 400
 
-        return jsonify({"date": date, "calories": daily_log['calories']}), 200
-
+        return jsonify({"date": log_date, "calories": daily_log['calories']}), 200
+    
     app.register_blueprint(calories_bp, url_prefix='/calories')
 
 if __name__ == "__main__":
