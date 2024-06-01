@@ -8,26 +8,27 @@ def init_progress_routes(app, mongo):
     progress_bp = Blueprint('progress', __name__)
     users_collection = mongo.db.users
     progress_tracker_collection = mongo.db.progress_tracker
+    sessions_collection = mongo.db.sessions
 
-    def auth_required(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
+    @app.before_request
+    def authenticate():
+        if request.path.startswith('/progress'):  
             token = request.headers.get('Authorization')
-            if not token or not token.startswith('Bearer '):
+            if not token or not token.startswith('Bearer '):  
                 return jsonify({"error": "Bearer token is missing"}), 401
-            token = token.split('Bearer ')[1]
+            token = token.split('Bearer ')[1]  
             try:
                 payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-                g.user = payload
+                g.user = payload  
+                session = sessions_collection.find_one({'username': payload['username'], 'tokens': token})
+                if not session:
+                    return jsonify({"error": "Invalid token"}), 401
             except jwt.ExpiredSignatureError:
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
-            return f(*args, **kwargs)
-        return decorated_function
 
     @progress_bp.route('/set_progressgoal', methods=['POST'])
-    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -93,7 +94,6 @@ def init_progress_routes(app, mongo):
         return jsonify({"message": "Goal set successfully"}), 201
 
     @progress_bp.route('/progress_log', methods=['POST'])
-    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -154,7 +154,6 @@ def init_progress_routes(app, mongo):
         return jsonify({"message": message}), 200
 
     @progress_bp.route('/achieved', methods=['GET'])
-    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -191,7 +190,6 @@ def init_progress_routes(app, mongo):
         return jsonify(goalsResult), 200
 
     @progress_bp.route('/progress_bydate', methods=['GET'])
-    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
