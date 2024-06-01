@@ -13,31 +13,35 @@ mongo = PyMongo(app)
 users_collection = mongo.db.users
 
 
-swagger_calories_tracker = {
+swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "Calories Tracker API",
-        "description": "API for calories tracker",
+        "title": "Exercise API",
+        "description": "API to get exercises by body part.",
         "version": "1.0.0"
     },
-    "host": "localhost:5000",  # Change this to your actual API host
+    "host": "localhost:5000",  
     "basePath": "/",
     "schemes": [
         "http",
         "https"
     ],
     "securityDefinitions": {
-        "BearerAuth": {
+        "Bearer": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "Enter your bearer token in the format 'Bearer {token}'"
+            "description": "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: 'Bearer 12345abcdef'"
         }
     },
-    "security": [{"BearerAuth": []}]
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
 }
 
-swagger = Swagger(app, template=swagger_calories_tracker)
+swagger = Swagger(app, template=swagger_template)
 
 
 CORS(app)  # Enable CORS for all routes
