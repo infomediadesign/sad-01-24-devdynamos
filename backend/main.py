@@ -175,9 +175,12 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
-            session_data = sessions_collection.find_one({"username": data['username'], "tokens": token})
+            session_data = sessions_collection.find_one({"username": data['username']})
             if not session_data:
-                return jsonify({'message': 'Token is invalid or session not found!'}), 401
+                return jsonify({'message': 'No active session for user {' + data['username'] + '} found!'}), 401
+            token_data = sessions_collection.find_one({"tokens": token})
+            if not token_data:
+                return jsonify({'message': 'Token is invalid '}), 401
             request.user = data['username']
         except Exception as e:
             return jsonify({'message': 'Token is invalid!'}), 401
