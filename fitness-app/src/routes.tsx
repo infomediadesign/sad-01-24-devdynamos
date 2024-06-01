@@ -8,8 +8,6 @@ import LogWorkout from './components/LogWorkout';
 import ProgressChart from './components/ProgressChart';
 import HomePage from './components/HomePage';
 import AuthForm from './components/AuthForm';
-import Dashboard from './components/Dashboard';
-import ProtectedRoute from './components/ProtectedRoute';
 import LogCalories from './components/LogCalories';
 import SetCalorieGoal from './components/SetCalorieGoal';
 import ViewProgress from './components/ViewProgress';
@@ -20,9 +18,6 @@ const AppRoutes: React.FC = () => (
             <Route path="/" element={<App />} />
             <Route path="home" element={<HomePage />} />
             <Route path="login" element={<AuthForm />} />
-            <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard/:username" element={<Dashboard />} />
-            </Route>
             <Route path="/log" element={<LogCalories />} />
             <Route path="/set_caloriesgoal" element={<SetCalorieGoal />} />
             { <Route path="/progress" element={<ViewProgress />} /> /*view calorie goal progress */}
