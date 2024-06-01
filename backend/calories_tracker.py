@@ -24,7 +24,7 @@ def init_calories_routes(app, mongo):
             token = token.split('Bearer ')[1]
             try:
                 payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-                g.user = payload['username']
+                g.user = payload
             except jwt.ExpiredSignatureError:
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
@@ -66,7 +66,7 @@ def init_calories_routes(app, mongo):
         if not start_date or not end_date or not goal or not activity:
             return jsonify({"error": "All fields are required"}), 400
 
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -160,7 +160,7 @@ def init_calories_routes(app, mongo):
         if not date or not calories:
             return jsonify({"error": "All fields are required"}), 400
 
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -233,7 +233,7 @@ def init_calories_routes(app, mongo):
         'security': [{'Bearer': []}]
     })
     def get_progress():
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -297,7 +297,7 @@ def init_calories_routes(app, mongo):
         if not date:
             return jsonify({"error": "Date is required"}), 400
 
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -352,7 +352,7 @@ def init_calories_routes(app, mongo):
         if not date:
             return jsonify({"error": "Date is required"}), 400
 
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
@@ -423,7 +423,7 @@ def init_calories_routes(app, mongo):
         if not start_date or not end_date:
             return jsonify({"error": "Start date and End date are required"}), 400
 
-        username = g.user
+        username = g.user['username']
         user = users_collection.find_one({'username': username})
         if not user:
             return jsonify({"error": "Invalid username"}), 400
