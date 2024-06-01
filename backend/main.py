@@ -28,7 +28,7 @@ swagger_template = {
         "description": "API to get exercises by body part.",
         "version": "1.0.0"
     },
-    "host": "localhost:5000",  # Change this to your actual API host
+    "host": "localhost:5000",  
     "basePath": "/",
     "schemes": [
         "http",
@@ -51,7 +51,7 @@ swagger_template = {
 
 swagger = Swagger(app, template=swagger_template)
 
-CORS(app)  # Enable CORS for all routes
+CORS(app)  
 
 @app.route('/registration', methods=['POST'])
 def create_user():
@@ -149,13 +149,11 @@ def login():
 
         session_data = sessions_collection.find_one({'username': username})
         if session_data:
-            # Append the new token to the existing array of tokens
             sessions_collection.update_one(
                 {'username': username},
                 {'$push': {'tokens': token}}
             )
         else:
-            # Create a new session document with the token
             session_data = {
                 "username": username,
                 "tokens": [token]
@@ -201,12 +199,10 @@ def logout():
     """
     token = request.headers['Authorization'].split(" ")[1]
     try:
-        # Remove the specific token from the user's session document
         sessions_collection.update_one(
             {"username": request.user},
             {"$pull": {"tokens": token}}
         )
-        # Optionally, remove the entire document if no tokens are left
         sessions_collection.delete_one({"username": request.user})
         return jsonify({"message": "User logged out successfully"}), 200
     except Exception as e:

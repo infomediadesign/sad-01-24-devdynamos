@@ -11,24 +11,26 @@ workouts_bp = Blueprint('workouts', __name__)
 def init_workouts_routes(app, mongo):
     body_parts_collection = mongo.db.bodyParts
     exercises_collection = mongo.db.excercises
+    sessions_collection = mongo.db.sessions
 
-    # Authentication middleware
     @app.before_request
     def authenticate():
-        if request.endpoint == 'workouts.get_exercises_by_body_part':
+        if request.path.startswith('/workouts'):  
             token = request.headers.get('Authorization')
-            if not token or not token.startswith('Bearer '):  # Check for Bearer keyword
+            if not token or not token.startswith('Bearer '):  
                 return jsonify({"error": "Bearer token is missing"}), 401
-            token = token.split('Bearer ')[1]  # Extract token value without Bearer keyword
+            token = token.split('Bearer ')[1]  
             try:
                 payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-                g.user = payload  # Store user data in Flask's global context
+                g.user = payload  
+                session = sessions_collection.find_one({'username': payload['username'], 'tokens': token})
+                if not session:
+                    return jsonify({"error": "Invalid token"}), 401
             except jwt.ExpiredSignatureError:
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
-
-    # Protected endpoint - Requires authentication
+            
     @workouts_bp.route('/exercises/<string:body_part>', methods=['GET'])
     @swag_from({
     "tags": ["Exercises"],
