@@ -180,6 +180,7 @@ def init_progress_routes(app, mongo):
             total_progress = sum(entry['progress'] for entry in goal['progresses'])
 
             progress_data = {
+                'goal_id' : str(goal['_id']),
                 'goal': goal['goal'],
                 'activity': goal['activity'],
                 'progress': total_progress,
