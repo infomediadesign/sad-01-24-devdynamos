@@ -266,7 +266,18 @@ def init_progress_routes(app, mongo):
         return jsonify({"message": "Goal deleted successfully"}), 200
     
     @progress_bp.route('/progress_bydate', methods=['DELETE'])
-    
+    @swag_from({
+        'tags': ['Progress'],
+        'responses': {
+            200: {'description': 'Progress deleted successfully'},
+            400: {'description': 'Date is required or Invalid username or No active goal for this period or No progress logged for this date'},
+            401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
+        },
+        'parameters': [
+            {'name': 'date', 'in': 'query', 'type': 'string', 'format': 'date', 'required': True}
+        ],
+        'security': [{'Bearer': []}]
+    })
     def delete_progress_by_date():
         date = request.args.get('date')
 
