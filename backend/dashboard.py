@@ -11,7 +11,8 @@ CORS(dashboard_bp)
 
 def init_dashboard_routes(app, mongo):
     sessions_collection = mongo.db.sessions
-    calories_tracker_collection = mongo.db.calories_tracker  # Add reference to the calories tracker collection
+    calories_tracker_collection = mongo.db.calories_tracker 
+    progress_tracker_collection = mongo.db.progress_tracker
 
     @app.before_request
     def authenticate():
@@ -31,30 +32,7 @@ def init_dashboard_routes(app, mongo):
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
 
-    @dashboard_bp.route('/dashboard', methods=['GET'])
-    @swag_from({
-        "tags": ["Dashboard"],
-        "responses": {
-            "200": {
-                "description": "Dashboard data for the authenticated user."
-            },
-            "401": {
-                "description": "Unauthorized access if token is missing or invalid."
-            }
-        },
-        "security": [
-            {
-                "Bearer": []
-            }
-        ]
-    })
-    def get_dashboard():
-        if not hasattr(g, 'user'):
-            return jsonify({"error": "Unauthorized access"}), 401
-
-        return jsonify({'message': f'Welcome to the dashboard, {g.user["username"]}'})
-
-    @dashboard_bp.route('/dashboard/current_week_progress', methods=['GET'])
+    @dashboard_bp.route('/dashboard/currentweek_calories', methods=['GET'])
     @swag_from({
         "tags": ["Dashboard"],
         "summary": "Get Current Week Progress",
@@ -101,5 +79,41 @@ def init_dashboard_routes(app, mongo):
         calories_burned = current_week_goal['calories_burned']
 
         return jsonify({'calories_burned': calories_burned}), 200
+    
+    @dashboard_bp.route('/dashboard/currentweek_progress', methods=['GET'])
+    @swag_from({
+        'tags': ['Progress'],
+        'responses': {
+            200: {'description': 'Success'},
+            400: {'description': 'No goals this week'},
+            401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
+        },
+        'parameters': []
+    })
+    def get_current_week_progresses():
+        if not hasattr(g, 'user'):
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        username = g.user['username']
+        current_date = datetime.now().date()
+
+        goals = progress_tracker_collection.find({'username': username})
+
+        if not goals:
+            return jsonify({"error": "No goals this week"}), 400
+
+        current_week_progress = None
+        for goal in goals:
+            start_date = datetime.strptime(goal['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(goal['end_date'], '%Y-%m-%d').date()
+            if start_date <= current_date <= end_date:
+                total_progress = sum(entry['progress'] for entry in goal['progresses'])
+                current_week_progress = total_progress
+                break
+
+        if current_week_progress is None:
+            return jsonify({"error": "No activity progress this week"}), 400
+
+        return jsonify({'progress': current_week_progress}), 200
 
     app.register_blueprint(dashboard_bp, url_prefix='/')
