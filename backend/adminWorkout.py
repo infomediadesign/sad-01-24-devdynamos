@@ -49,6 +49,17 @@ def init_admin_routes(app, mongo):
 
         result = exercises_collection.insert_one(exercise)
         return jsonify({"message": "Exercise added successfully"}), 201
+    
+    @admin_bp.route('/exercises/<string:exercise_id>', methods=['DELETE'])
+    def delete_exercise(exercise_id):
+        if not hasattr(g, 'user'):
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        result = exercises_collection.delete_one({'_id': ObjectId(exercise_id)})
+        if result.deleted_count == 0:
+            return jsonify({"error": "Exercise not found"}), 404
+
+        return jsonify({"message": "Exercise deleted successfully"}), 200
 
     app.register_blueprint(admin_bp, url_prefix='/admin')
     
