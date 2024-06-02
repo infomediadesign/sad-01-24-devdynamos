@@ -32,10 +32,11 @@ def init_calories_routes(app, mongo):
             return f(*args, **kwargs)
         return decorated_function
 
-    @calories_bp.route('/set_caloriesgoal', methods=['POST'])
+    @calories_bp.route('/goal', methods=['POST'])
     @auth_required
     @swag_from({
         'tags': ['Calories Tracker'],
+        'summary': 'Set a Goal',
         'responses': {
             201: {'description': 'Goal set successfully'},
             400: {'description': 'All fields are required or Invalid username or A goal already exists for the specified period'},
@@ -114,11 +115,11 @@ def init_calories_routes(app, mongo):
         calories_tracker_collection.insert_one(goal_data)
         return jsonify({"message": "Goal set successfully"}), 201
 
-    @calories_bp.route('/log', methods=['POST'])
+    @calories_bp.route('', methods=['POST'])
     @auth_required
     @swag_from({
         'tags': ['Calories Tracker'],
-        'summary': 'Log Calories',
+        'summary': 'Add Calories by date',
         'description': 'Log the calories consumed for a specific date and update the calorie goal progress.',
         'parameters': [
             {
@@ -255,7 +256,7 @@ def init_calories_routes(app, mongo):
 
         return jsonify(progress_list), 200
 
-    @calories_bp.route('/calories_bydate', methods=['GET'])
+    @calories_bp.route('', methods=['GET'])
     @auth_required
     @swag_from({
         'tags': ['Calories Tracker'],
@@ -323,7 +324,7 @@ def init_calories_routes(app, mongo):
 
         return jsonify({"date": log_date, "calories": daily_log['calories']}), 200
     
-    @calories_bp.route('/delete_bydate', methods=['DELETE'])
+    @calories_bp.route('', methods=['DELETE'])
     @auth_required
     @swag_from({
         'tags': ['Calories Tracker'],
@@ -385,11 +386,11 @@ def init_calories_routes(app, mongo):
 
         return jsonify({"message": "Calories log deleted successfully"}), 200
 
-    @calories_bp.route('/delete_goal', methods=['DELETE'])
+    @calories_bp.route('/goals', methods=['DELETE'])
     @auth_required
     @swag_from({
         'tags': ['Calories Tracker'],
-        'summary': 'Delete Set Goal',
+        'summary': 'Delete goals',
         'description': 'Delete a calorie goal for a specified period.',
         'parameters': [
             {

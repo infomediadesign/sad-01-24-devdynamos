@@ -32,10 +32,10 @@ def init_dashboard_routes(app, mongo):
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
 
-    @dashboard_bp.route('/dashboard/currentweek_calories', methods=['GET'])
+    @dashboard_bp.route('/calories', methods=['GET'])
     @swag_from({
         "tags": ["Dashboard"],
-        "summary": "Get Current Week Progress",
+        "summary": "Get Current Week Calories Burned Progress",
         "description": "Retrieve the progress of the current week for the authenticated user.",
         "responses": {
             "200": {
@@ -80,9 +80,10 @@ def init_dashboard_routes(app, mongo):
 
         return jsonify({'calories_burned': calories_burned}), 200
     
-    @dashboard_bp.route('/dashboard/currentweek_progress', methods=['GET'])
+    @dashboard_bp.route('/progress', methods=['GET'])
     @swag_from({
         'tags': ['Dashboard'],
+        "summary": "Get Current Week Calories Burned Progress",
         'responses': {
             200: {'description': 'Success'},
             400: {'description': 'No goals this week'},
@@ -116,4 +117,4 @@ def init_dashboard_routes(app, mongo):
 
         return jsonify({'progress': current_week_progress}), 200
 
-    app.register_blueprint(dashboard_bp, url_prefix='/')
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
