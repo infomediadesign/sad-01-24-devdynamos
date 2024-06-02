@@ -3,6 +3,7 @@ import datetime
 import jwt
 from functools import wraps
 from flasgger import swag_from
+from bson import ObjectId
 
 def init_progress_routes(app, mongo):
     progress_bp = Blueprint('progress', __name__)
@@ -229,5 +230,39 @@ def init_progress_routes(app, mongo):
             return jsonify({"error": "No progress logged for this date"}), 400
 
         return jsonify({"date": log_date, "progress": daily_log['progress']}), 200
+    
+    @progress_bp.route('/achieved/<goal_id>', methods=['DELETE'])
+    @swag_from({
+        'tags': ['Progress'],
+        'responses': {
+            200: {'description': 'Goal deleted successfully'},
+            400: {'description': 'Invalid username, Goal not found, or Invalid Goal ID'},
+            401: {'description': 'Bearer token is missing or Token has expired or Invalid token'}
+        },
+        'parameters': [
+            {
+                'name': 'goal_id',
+                'in': 'path',
+                'type': 'string',
+                'required': True,
+                'description': 'The ObjectId of the goal to delete'
+            }
+        ]
+    })
+    def delete_progress(goal_id):
+        username = g.user['username']
+        user = users_collection.find_one({'username': username})
+        if not user:
+            return jsonify({"error": "Invalid username"}), 400
+
+        if not ObjectId.is_valid(goal_id):
+            return jsonify({"error": "Invalid Goal ID"}), 400
+
+        result = progress_tracker_collection.delete_one({'_id': ObjectId(goal_id), 'username': username})
+
+        if result.deleted_count == 0:
+            return jsonify({"error": "Goal not found"}), 400
+
+        return jsonify({"message": "Goal deleted successfully"}), 200
 
     app.register_blueprint(progress_bp, url_prefix='/progress')
