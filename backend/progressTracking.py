@@ -29,7 +29,7 @@ def init_progress_routes(app, mongo):
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
 
-    @progress_bp.route('/set_progressgoal', methods=['POST'])
+    @progress_bp.route('/goal', methods=['POST'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -94,7 +94,7 @@ def init_progress_routes(app, mongo):
         progress_tracker_collection.insert_one(goal_data)
         return jsonify({"message": "Goal set successfully"}), 201
 
-    @progress_bp.route('/progress_log', methods=['POST'])
+    @progress_bp.route('', methods=['POST'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -154,7 +154,7 @@ def init_progress_routes(app, mongo):
 
         return jsonify({"message": message}), 200
 
-    @progress_bp.route('/achieved', methods=['GET'])
+    @progress_bp.route('/all', methods=['GET'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -191,7 +191,7 @@ def init_progress_routes(app, mongo):
 
         return jsonify(goalsResult), 200
 
-    @progress_bp.route('/progress_bydate', methods=['GET'])
+    @progress_bp.route('', methods=['GET'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -232,7 +232,7 @@ def init_progress_routes(app, mongo):
 
         return jsonify({"date": log_date, "progress": daily_log['progress']}), 200
     
-    @progress_bp.route('/achieved/<goal_id>', methods=['DELETE'])
+    @progress_bp.route('goal/<goal_id>', methods=['DELETE'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -266,7 +266,7 @@ def init_progress_routes(app, mongo):
 
         return jsonify({"message": "Goal deleted successfully"}), 200
     
-    @progress_bp.route('/progress_bydate', methods=['DELETE'])
+    @progress_bp.route('', methods=['DELETE'])
     @swag_from({
         'tags': ['Progress'],
         'responses': {
