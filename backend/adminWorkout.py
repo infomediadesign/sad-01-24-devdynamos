@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, g
 from bson.objectid import ObjectId
 import jwt
+from flasgger import swag_from
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -27,6 +28,42 @@ def init_admin_routes(app, mongo):
             return jsonify({"error": "Invalid token"}), 401
 
     @admin_bp.route('/exercises', methods=['POST'])
+    @swag_from({
+        "tags": ["Admin"],
+        "security": [{"Bearer": []}],
+        "parameters": [
+            {
+                "name": "body",
+                "in": "body",
+                "required": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "youtube_link": {"type": "string"},
+                        "bodyPart": {"type": "string"},
+                        "description": {"type": "string"}
+                    },
+                    "required": ["name", "youtube_link", "bodyPart", "description"]
+                }
+            }
+        ],
+        "responses": {
+            "201": {
+                "description": "Exercise added successfully",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "message": {"type": "string"},
+                        "id": {"type": "string"}
+                    }
+                }
+            },
+            "400": {"description": "Missing required fields"},
+            "401": {"description": "Unauthorized access or invalid token"},
+            "404": {"description": "Body part not found"}
+        }
+    })
     def add_exercise():
         if not hasattr(g, 'user'):
             return jsonify({"error": "Unauthorized access"}), 401
