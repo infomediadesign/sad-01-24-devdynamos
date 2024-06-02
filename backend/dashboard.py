@@ -82,7 +82,7 @@ def init_dashboard_routes(app, mongo):
     
     @dashboard_bp.route('/dashboard/currentweek_progress', methods=['GET'])
     @swag_from({
-        'tags': ['Progress'],
+        'tags': ['Dashboard'],
         'responses': {
             200: {'description': 'Success'},
             400: {'description': 'No goals this week'},
