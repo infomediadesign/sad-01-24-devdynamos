@@ -106,7 +106,7 @@ def create_user():
         return jsonify({"error": "Email already exists"}), 400
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    user_data = {'username': username, 'password': hashed_password, 'email': email, 'age': age, 'created_at': datetime.datetime.utcnow()}
+    user_data = {'username': username, 'password': hashed_password, 'email': email, 'age': age, 'created_at': datetime.datetime.utcnow(), 'hasRole' : 'default'}
     users_collection.insert_one(user_data)
     return jsonify({"message": "User created successfully"}), 201
 
@@ -145,7 +145,9 @@ def login():
         return jsonify({"error": "Invalid username or password"}), 400
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        userData = users_collection.find_one({'username' : user['username']})
+        print("USERNAME :: ", userData['hasRole'])
+        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10), "sub": "fitnessTrackingSystem", "hasRole" : userData['hasRole']}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         session_data = sessions_collection.find_one({'username': username})
         if session_data:
