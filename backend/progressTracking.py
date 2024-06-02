@@ -264,5 +264,42 @@ def init_progress_routes(app, mongo):
             return jsonify({"error": "Goal not found"}), 400
 
         return jsonify({"message": "Goal deleted successfully"}), 200
+    
+    @progress_bp.route('/progress_bydate', methods=['DELETE'])
+    
+    def delete_progress_by_date():
+        date = request.args.get('date')
+
+        if not date:
+            return jsonify({"error": "Date is required"}), 400
+
+        username = g.user['username']
+        user = users_collection.find_one({'username': username})
+        if not user:
+            return jsonify({"error": "Invalid username"}), 400
+
+        log_date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
+        goal = progress_tracker_collection.find_one({
+            'username': username,
+            'start_date': {'$lte': log_date},
+            'end_date': {'$gte': log_date}
+        })
+
+        if not goal:
+            return jsonify({"error": "No active goal for this period"}), 400
+
+        daily_log = next((entry for entry in goal['progresses'] if entry['date'] == log_date), None)
+
+        if not daily_log:
+            return jsonify({"error": "No progress logged for this date"}), 400
+
+        # Remove the specific progress log for the date
+        progress_tracker_collection.update_one(
+            {'_id': goal['_id']},
+            {'$pull': {'progresses': {'date': log_date}}}
+        )
+
+        return jsonify({"message": "Progress deleted successfully"}), 200
+
 
     app.register_blueprint(progress_bp, url_prefix='/progress')
