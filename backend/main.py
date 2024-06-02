@@ -26,8 +26,8 @@ init_dashboard_routes(app, mongo)
 swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "Exercise API",
-        "description": "API to get exercises by body part.",
+        "title": "Fitness Tracking System",
+        "description": "API to get access to features of Application.",
         "version": "1.0.0"
     },
     "host": "localhost:5000",  
