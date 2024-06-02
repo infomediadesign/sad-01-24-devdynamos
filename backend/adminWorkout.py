@@ -88,6 +88,24 @@ def init_admin_routes(app, mongo):
         return jsonify({"message": "Exercise added successfully"}), 201
     
     @admin_bp.route('/exercises/<string:exercise_id>', methods=['DELETE'])
+    @swag_from({
+        "tags": ["Admin"],
+        "security": [{"Bearer": []}],
+        "parameters": [
+            {
+                "name": "exercise_id",
+                "in": "path",
+                "type": "string",
+                "required": True,
+                "description": "The ID of the exercise to delete"
+            }
+        ],
+        "responses": {
+            "200": {"description": "Exercise deleted successfully"},
+            "401": {"description": "Unauthorized access or invalid token"},
+            "404": {"description": "Exercise not found"}
+        }
+    })
     def delete_exercise(exercise_id):
         if not hasattr(g, 'user'):
             return jsonify({"error": "Unauthorized access"}), 401
