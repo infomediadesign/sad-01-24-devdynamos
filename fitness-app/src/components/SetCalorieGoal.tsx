@@ -1,58 +1,54 @@
-// src/components/SetCalorieGoal.tsx
 import React, { useState } from 'react';
-import { setCalorieGoal } from '../services/calorieServices';
-import moment from 'moment';
+import { useAuth } from './AuthContext'; // Import the useAuth hook
+import calorieServices from '../services/calorieServices';
+import moment from 'moment'; // Import moment for date formatting
 
 const SetCalorieGoal: React.FC = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    start_date: '',
-    end_date: '',
-    goal: '',
-    activity: ''
-  });
+    const { setCalorieGoal } = calorieServices;
+    const { token } = useAuth(); // Get token from useAuth hook
+    const [start_date, setStartDate] = useState('');
+    const [end_date, setEndDate] = useState('');
+    const [goal, setGoal] = useState(0);
+    const [activity, setActivity] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Format the dates to dd-mm-yyyy
-    const formattedFormData = {
-      ...formData,
-      start_date: moment(formData.start_date).format('DD-MM-YYYY'),
-      end_date: moment(formData.end_date).format('DD-MM-YYYY')
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            if (token) { // Ensure token is not undefined
+                // Format the dates to dd-mm-yyyy
+                const formattedStartDate = moment(start_date).format('DD-MM-YYYY');
+                const formattedEndDate = moment(end_date).format('DD-MM-YYYY');
+                
+                const response = await setCalorieGoal(formattedStartDate, formattedEndDate, goal, activity); // Pass token to setCalorieGoal
+                alert(response.message);
+            }
+        } catch (error) {
+            alert('Error setting calorie goal');
+        }
     };
 
-    try {
-      await setCalorieGoal(formattedFormData);
-      alert('Goal set successfully');
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Error setting goal:', error);
-        alert('Error setting goal: ' + error.message);
-      } else {
-        console.error('Unexpected error', error);
-        alert('An unexpected error occurred');
-      }
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="username" placeholder="Username" onChange={handleChange} />
-      <input type="date" name="start_date" placeholder="Start Date" onChange={handleChange} />
-      <input type="date" name="end_date" placeholder="End Date" onChange={handleChange} />
-      <input type="number" name="goal" placeholder="Goal" onChange={handleChange} />
-      <input type="text" name="activity" placeholder="Activity" onChange={handleChange} />
-      <button type="submit">Set Goal</button>
-    </form>
-  );
+    return (
+        <form onSubmit={handleSubmit}>
+            <h2>Set Calorie Goal</h2>
+            <div>
+                <label>Start Date:</label>
+                <input type="date" value={start_date} onChange={e => setStartDate(e.target.value)} required />
+            </div>
+            <div>
+                <label>End Date:</label>
+                <input type="date" value={end_date} onChange={e => setEndDate(e.target.value)} required />
+            </div>
+            <div>
+                <label>Goal:</label>
+                <input type="number" value={goal} onChange={e => setGoal(Number(e.target.value))} required />
+            </div>
+            <div>
+                <label>Activity:</label>
+                <input type="text" value={activity} onChange={e => setActivity(e.target.value)} required />
+            </div>
+            <button type="submit">Set Goal</button>
+        </form>
+    );
 };
 
 export default SetCalorieGoal;
