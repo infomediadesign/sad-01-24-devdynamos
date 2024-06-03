@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, g
 from bson.objectid import ObjectId
 import jwt
 from flasgger import swag_from
+from bson import ObjectId
 
 admin_manageuser_bp = Blueprint('admin_manageuser', __name__)
 
@@ -86,19 +87,16 @@ def init_admin_manageuser_routes(app, mongo):
     def get_logged_in_users():
         if not hasattr(g, 'user'):
             return jsonify({"error": "Unauthorized access"}), 401
-
-        # Query the sessions collection to fetch all active sessions
+        
         active_sessions = sessions_collection.find({}, {'_id': 0, 'username': 1})
-
-        # Create a list to store the details of logged-in users
         logged_in_users = []
 
-        # Iterate through each session and fetch user details from the users collection
         for session in active_sessions:
-            user = users_collection.find_one({'username': session['username']}, {'_id': 0, 'username': 1, 'email': 1, 'hasRole': 1})
+            user = users_collection.find_one({'username': session['username']}, {'_id': 1, 'username': 1, 'email': 1, 'hasRole': 1})
             if user:
+                user['_id'] = str(user['_id'])  # Convert ObjectId to string
                 logged_in_users.append(user)
 
         return jsonify(logged_in_users), 200
-
+    
     app.register_blueprint(admin_manageuser_bp, url_prefix='/adminview')
