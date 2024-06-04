@@ -117,6 +117,48 @@ def init_admin_routes(app, mongo):
         return jsonify({"message": "Exercise deleted successfully"}), 200
     
     @admin_bp.route('/exercises/<string:exercise_id>', methods=['PUT'])
+    @swag_from({
+        "tags": ["Admin"],
+        "security": [{"Bearer": []}],
+        "parameters": [
+            {
+                "name": "exercise_id",
+                "in": "path",
+                "type": "string",
+                "required": True,
+                "description": "The ID of the exercise to edit"
+            },
+            {
+                "name": "body",
+                "in": "body",
+                "required": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "youtube_link": {"type": "string"},
+                        "bodyPart": {"type": "string"},
+                        "description": {"type": "string"}
+                    },
+                    "required": ["name", "youtube_link", "bodyPart", "description"]
+                }
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Exercise updated successfully",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "message": {"type": "string"}
+                    }
+                }
+            },
+            "400": {"description": "Missing required fields"},
+            "401": {"description": "Unauthorized access or invalid token"},
+            "404": {"description": "Exercise or Body part not found"}
+        }
+    })
     def edit_exercise(exercise_id):
         if not hasattr(g, 'user'):
             return jsonify({"error": "Unauthorized access"}), 401
