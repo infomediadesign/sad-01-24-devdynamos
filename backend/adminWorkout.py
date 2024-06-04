@@ -115,6 +115,28 @@ def init_admin_routes(app, mongo):
             return jsonify({"error": "Exercise not found"}), 404
 
         return jsonify({"message": "Exercise deleted successfully"}), 200
+    
+    @admin_bp.route('/exercises/<string:exercise_id>', methods=['PUT'])
+    def edit_exercise(exercise_id):
+        if not hasattr(g, 'user'):
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        data = request.get_json()
+        required_fields = ['name', 'youtube_link', 'bodyPart', 'description']
+        if not all(field in data for field in required_fields):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        body_part_document = body_parts_collection.find_one({'name': data['bodyPart']})
+        if not body_part_document:
+            return jsonify({"error": "Body part not found"}), 404
+
+        
+
+        result = exercises_collection.update_one({'_id': ObjectId(exercise_id)}, {'$set': update})
+        if result.matched_count == 0:
+            return jsonify({"error": "Exercise not found"}), 404
+
+        return jsonify({"message": "Exercise updated successfully"}), 200
 
     app.register_blueprint(admin_bp, url_prefix='/admin')
     
