@@ -99,18 +99,18 @@ def init_admin_manageuser_routes(app, mongo):
 
         return jsonify(logged_in_users), 200
     
-    @admin_manageuser_bp.route('/users/<string:username>', methods=['PUT'])
+    @admin_manageuser_bp.route('/users/<string:user_id>', methods=['PUT'])
     @swag_from({
-        "tags": ["Admin"],
+        "tags": ["AdminManageUser"],
         "summary": "Update user details",
         "security": [{"Bearer": []}],
         "parameters": [
             {
-                "name": "username",
+                "name": "user_id",
                 "in": "path",
-                "type": "string",
                 "required": True,
-                "description": "The username of the user to update"
+                "type": "string",
+                "description": "The ID of the user to update"
             },
             {
                 "name": "body",
@@ -123,7 +123,7 @@ def init_admin_manageuser_routes(app, mongo):
                         "email": {"type": "string"},
                         "age": {"type": "integer"}
                     },
-                    "required": ["username"]
+                    "required": ["new_username", "email", "age"]
                 }
             }
         ],
@@ -142,27 +142,23 @@ def init_admin_manageuser_routes(app, mongo):
             "404": {"description": "User not found"}
         }
     })
-    def update_user(username):
+    def update_user(user_id):
         if not hasattr(g, 'user'):
             return jsonify({"error": "Unauthorized access"}), 401
 
         data = request.get_json()
-        new_username = data.get('new_username')
-        email = data.get('email')
-        age = data.get('age')
-
         update_data = {}
-        if email:
-            update_data['email'] = email
-        if age:
-            update_data['age'] = age
-        if new_username:
-            update_data['username'] = new_username
+        if 'email' in data:
+            update_data['email'] = data['email']
+        if 'age' in data:
+            update_data['age'] = data['age']
+        if 'new_username' in data:
+            update_data['username'] = data['new_username']
 
         if not update_data:
             return jsonify({"error": "Invalid input data"}), 400
 
-        result = users_collection.update_one({'username': username}, {'$set': update_data})
+        result = users_collection.update_one({'_id': ObjectId(user_id)}, {'$set': update_data})
         if result.matched_count == 0:
             return jsonify({"error": "User not found"}), 404
 
