@@ -130,7 +130,12 @@ def init_admin_routes(app, mongo):
         if not body_part_document:
             return jsonify({"error": "Body part not found"}), 404
 
-        
+        update = {
+            "name": data['name'],
+            "youtube_link": data['youtube_link'],
+            "bodyPart_ref": str(body_part_document['_id']),
+            "description": data['description']
+        }
 
         result = exercises_collection.update_one({'_id': ObjectId(exercise_id)}, {'$set': update})
         if result.matched_count == 0:
