@@ -163,5 +163,34 @@ def init_admin_manageuser_routes(app, mongo):
             return jsonify({"error": "User not found"}), 404
 
         return jsonify({"message": "User updated successfully"}), 200
+    
+    @admin_manageuser_bp.route('/users/<string:user_id>', methods=['DELETE'])
+    @swag_from({
+        "tags": ["Admin"],
+        "security": [{"Bearer": []}],
+        "parameters": [
+            {
+                "name": "user_id",
+                "in": "path",
+                "type": "string",
+                "required": True,
+                "description": "The ID of the user to delete"
+            }
+        ],
+        "responses": {
+            "200": {"description": "User deleted successfully"},
+            "401": {"description": "Unauthorized access or invalid token"},
+            "404": {"description": "User not found"}
+        }
+    })
+    def delete_user(user_id):
+        if not hasattr(g, 'user'):
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        result = users_collection.delete_one({'_id': ObjectId(user_id)})
+        if result.deleted_count == 0:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"message": "User deleted successfully"}), 200
 
     app.register_blueprint(admin_manageuser_bp, url_prefix='/adminview')
