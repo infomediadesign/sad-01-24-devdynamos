@@ -17,7 +17,6 @@ app.config.from_object(Config)
 
 mongo = PyMongo(app)
 users_collection = mongo.db.users
-blacklist_collection = mongo.db.token_blacklist
 sessions_collection = mongo.db.sessions
 
 init_calories_routes(app, mongo)
