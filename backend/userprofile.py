@@ -46,35 +46,35 @@ def init_user_profile_routes(app, mongo):
         user['_id'] = str(user['_id'])  # Convert ObjectId to string
         user = json.loads(json.dumps(user, default=str))  # Serialize BSON types
         return jsonify(user), 200
- 
+
     @user_profile_bp.route('/profile', methods=['PUT'])
     def update_user_profile():
         """
         Update user profile
         ---
         tags:
-        - User Profile
+          - User Profile
         parameters:
-        - name: body
+          - name: body
             in: body
             required: true
             schema:
-            type: object
-            properties:
+              type: object
+              properties:
                 age:
-                type: integer
+                  type: integer
                 username:
-                type: string
+                  type: string
                 email:
-                type: string
+                  type: string
                 password:
-                type: string
+                  type: string
         responses:
-        200:
+          200:
             description: User profile updated successfully
-        400:
+          400:
             description: Bad request
-        401:
+          401:
             description: Unauthorized access
         """
         if not hasattr(g, 'user'):
@@ -95,7 +95,7 @@ def init_user_profile_routes(app, mongo):
             user[field] = value
         users_collection.update_one({'_id': user['_id']}, {'$set': user})
         return jsonify({"message": "User profile updated successfully"}), 200
-    
+
     @user_profile_bp.route('/account', methods=['DELETE'])
     def delete_user_account():
         """
