@@ -17,11 +17,14 @@ interface AuthResponse {
 export const authenticateUser = async (endpoint: string, formData: FormData): Promise<AuthResponse> => {
   try {
     const response = await axios.post(`${API_URL}${endpoint}`, formData);
-    if (response.data.jwt_token) {
-      localStorage.setItem('token', response.data.jwt_token);
+    const token = response.data.jwt_token;
+
+    if (token) {
+      localStorage.setItem('token', token);
       // Set the default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.jwt_token}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+
     return response.data;
   } catch (error: any) {
     const errorMessage = error.response ? (error.response.data.error || 'Something went wrong') : 'Network error';
