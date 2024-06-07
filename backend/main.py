@@ -151,7 +151,7 @@ def login():
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
         userData = users_collection.find_one({'username' : user['username']})
         print("USERNAME :: ", userData['hasRole'])
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10), "sub": "fitnessTrackingSystem", "hasRole" : userData['hasRole']}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30), "sub": "fitnessTrackingSystem", "hasRole" : userData['hasRole']}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         session_data = sessions_collection.find_one({'username': username})
         if session_data:
