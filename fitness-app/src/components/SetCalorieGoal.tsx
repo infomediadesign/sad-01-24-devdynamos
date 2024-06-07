@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { setCalorieGoal } from '../services/calorieServices';
 import BackButton from './common/BackButton';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
 // Custom input component for the date picker
 const CustomInput = forwardRef<HTMLInputElement, any>(({ value, onClick, placeholder }, ref) => (
@@ -20,7 +20,7 @@ const CustomInput = forwardRef<HTMLInputElement, any>(({ value, onClick, placeho
 const SetCalorieGoal: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [goal, setGoal] = useState<number>(0);
+  const [goal, setGoal] = useState<string>('');
   const [activity, setActivity] = useState('');
   const [message, setMessage] = useState('');
 
@@ -33,7 +33,7 @@ const SetCalorieGoal: React.FC = () => {
       const data = await setCalorieGoal({
         start_date: formattedStartDate,
         end_date: formattedEndDate,
-        goal,
+        goal: parseInt(goal) || 0,
         activity,
       });
       setMessage(data.message);
@@ -42,7 +42,7 @@ const SetCalorieGoal: React.FC = () => {
       setTimeout(() => {
         setStartDate(null);
         setEndDate(null);
-        setGoal(0);
+        setGoal('');
         setActivity('');
         setMessage('');
       }, 2500); // 2500 milliseconds = 2.5 seconds
@@ -52,6 +52,22 @@ const SetCalorieGoal: React.FC = () => {
       } else {
         setMessage('Unexpected error');
       }
+    }
+  };
+
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    if (date) {
+      setEndDate(addDays(date, 6));
+    } else {
+      setEndDate(null);
+    }
+  };
+
+  const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {  // Only allow digits
+      setGoal(value);
     }
   };
 
@@ -70,25 +86,28 @@ const SetCalorieGoal: React.FC = () => {
         </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Set Calorie Goal</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            dateFormat="dd-MM-yyyy"
-            placeholderText="Start Date (dd-mm-yyyy)"
-            customInput={<CustomInput />}
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            dateFormat="dd-MM-yyyy"
-            placeholderText="End Date (dd-mm-yyyy)"
-            customInput={<CustomInput />}
-          />
+          <div className="flex space-x-4">
+            <DatePicker
+              selected={startDate}
+              onChange={handleStartDateChange}
+              dateFormat="dd-MM-yyyy"
+              placeholderText="Start Date"
+              customInput={<CustomInput />}
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={setEndDate}
+              dateFormat="dd-MM-yyyy"
+              placeholderText="End Date"
+              customInput={<CustomInput />}
+              readOnly
+            />
+          </div>
           <input
-            type="number"
+            type="text"
             value={goal}
-            onChange={(e) => setGoal(Number(e.target.value))}
-            placeholder="Goal"
+            onChange={handleGoalChange}
+            placeholder="Calories"
             className="w-full p-3 border border-gray-300 rounded-lg text-center"
           />
           <input
