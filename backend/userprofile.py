@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 from bson import ObjectId
-import json, jwt
+import json, jwt, bcrypt, re
 from flasgger import Swagger
 
 user_profile_bp = Blueprint('user_profile', __name__)
@@ -67,9 +67,13 @@ def init_user_profile_routes(app, mongo):
                 type: string
                 email:
                 type: string
+                password:
+                type: string
         responses:
         200:
             description: User profile updated successfully
+        400:
+            description: Bad request
         401:
             description: Unauthorized access
         """
@@ -77,11 +81,18 @@ def init_user_profile_routes(app, mongo):
             return jsonify({"error": "Unauthorized access"}), 401
         user = g.user
         data = request.get_json()
-        allowed_fields = {'age', 'username', 'email'}
-        for key in data.keys():
-            if key not in allowed_fields:
-                return jsonify({"error": f"Field '{key}' cannot be updated"}), 400
-        user.update({k: v for k, v in data.items() if k in allowed_fields})
+        allowed_fields = {'age', 'username', 'email', 'password'}
+        for field in data.keys():
+            if field not in allowed_fields:
+                return jsonify({"error": f"Invalid field to update: {field}"}), 400
+        if 'password' in data:
+            password = data['password']
+            if len(password) < 8 or not re.search("[0-9]", password) or not re.search("[!@#$%^&*]", password):
+                return jsonify({"error": "Password must be at least 8 characters long and contain at least one special character and one number"}), 400
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            data['password'] = hashed_password
+        for field, value in data.items():
+            user[field] = value
         users_collection.update_one({'_id': user['_id']}, {'$set': user})
         return jsonify({"message": "User profile updated successfully"}), 200
     
