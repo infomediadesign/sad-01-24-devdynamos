@@ -10,7 +10,7 @@ from workouts import init_workouts_routes
 from progressTracking import init_progress_routes
 from dashboard import init_dashboard_routes
 from admin import init_admin_routes
-
+from userprofile import init_user_profile_routes
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -24,6 +24,7 @@ init_workouts_routes(app, mongo)
 init_progress_routes(app, mongo)
 init_dashboard_routes(app, mongo)
 init_admin_routes(app, mongo)
+init_user_profile_routes(app, mongo)
 
 swagger_template = {
     "swagger": "2.0",
