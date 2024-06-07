@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { generateWorkoutRoutine } from '../services/workoutRoutineService';
 
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number | string;
+  rest: string;
+}
+
 interface WorkoutDay {
   day: string;
-  exercise?: string;
-  sets?: number;
-  reps?: number | string;
-  rest_time?: string;
-  rest_day?: boolean;
+  exercises?: Exercise[];
+  rest?: string;
 }
 
 const WorkoutRoutine: React.FC = () => {
@@ -17,7 +21,7 @@ const WorkoutRoutine: React.FC = () => {
   const [goal, setGoal] = useState('');
   const [fitnessLevel, setFitnessLevel] = useState('');
   const [equipment, setEquipment] = useState<string[]>([]);
-  const [routine, setRoutine] = useState<{ [key: string]: any }>({});
+  const [routine, setRoutine] = useState<{ [key: string]: WorkoutDay }>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -167,15 +171,17 @@ const WorkoutRoutine: React.FC = () => {
               <tbody>
                 {Object.entries(routine).map(([day, details], index) => (
                   <React.Fragment key={index}>
-                    {details === "Rest Day" ? (
+                    {details.rest ? (
                       <tr>
-                        <td className="border px-4 py-2">{day}</td>
+                        <td className="border px-4 py-2">{details.day}</td>
                         <td className="border px-4 py-2" colSpan={4}>Rest Day</td>
                       </tr>
                     ) : (
-                      details.exercises.map((exercise: any, exerciseIndex: number) => (
+                      details.exercises?.map((exercise, exerciseIndex) => (
                         <tr key={exerciseIndex}>
-                          {exerciseIndex === 0 && <td className="border px-4 py-2" rowSpan={details.exercises.length}>{day}</td>}
+                          {exerciseIndex === 0 && details.exercises && (
+                            <td className="border px-4 py-2" rowSpan={details.exercises.length}>{details.day}</td>
+                          )}
                           <td className="border px-4 py-2">{exercise.name}</td>
                           <td className="border px-4 py-2">{exercise.sets}</td>
                           <td className="border px-4 py-2">{exercise.reps}</td>
