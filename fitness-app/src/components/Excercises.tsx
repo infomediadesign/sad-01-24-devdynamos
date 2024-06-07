@@ -26,8 +26,8 @@ const Exercises: React.FC = () => {
       });
   }, [muscleGroup]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="text-center py-4">Loading...</p>;
+  if (error) return <p className="text-center text-red-500 py-4">{error}</p>;
 
   const getEmbedUrl = (url: string) => {
     const urlObj = new URL(url);
@@ -37,27 +37,32 @@ const Exercises: React.FC = () => {
 
   return (
     exercise ? (
-      <div className="exercise-container p-4">
-        <h1 className="text-2xl font-bold mb-4">{exercise.muscleName} Exercise</h1>
-        <div className="video-container mb-4">
-          <iframe
-            width="560"
-            height="315"
-            src={getEmbedUrl(exercise.videoUrl)}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden mt-40 ">
+        <div className="bg-blue-600 p-4">
+          <h1 className="text-3xl font-bold text-white">{exercise.muscleName} Exercise</h1>
         </div>
-        <ul className="instructions-list list-decimal list-inside">
-          {exercise.description.map((point, index) => (
-            <li key={index} className="mb-2">{point}</li>
-          ))}
-        </ul>
+        <div className="p-4">
+          <div className="aspect-w-16 aspect-h-9 mb-4">
+            <iframe
+              width="560"
+              height="315"
+              src={getEmbedUrl(exercise.videoUrl)}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+          <ul className="list-decimal pl-5">
+            {exercise.description.map((point, index) => (
+              <li key={index} className="mb-2 text-lg">{point}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     ) : (
-      <p>No exercise data available.</p>
+      <p className="text-center py-4">No exercise data available.</p>
     )
   );
 };

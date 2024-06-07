@@ -16,67 +16,45 @@ const posteriorData: IExerciseData[] = [
 
 const MuscleGroupMap: React.FC = () => {
     const [hoveredMuscle, setHoveredMuscle] = useState<string | null>(null);
-    const [clickedMuscle, setClickedMuscle] = useState<string | null>(null);
 
     const navigate = useNavigate();
 
-    const handleMouseEnter = (muscle: string) => {
-        setHoveredMuscle(muscle);
-    };
-
-    const handleMouseLeave = () => {
-        setHoveredMuscle(null);
-    };
-
     const handleClick = useCallback(({ muscle }: IMuscleStats) => {
-        setClickedMuscle(muscle);
-        setTimeout(() => {
-            setClickedMuscle(null);
-        }, 5000); // Hides the message after 5 seconds
-    }, []);
+        navigate(`/exercises/${muscle}`);
+    }, [navigate]);
 
     return (
-        <div className="relative z-10 flex flex-col items-center space-y-8 py-8">
-            <div className="flex justify-center space-x-8">
-                <div
-                    className="flex-1 flex justify-center"
-                    onMouseEnter={() => handleMouseEnter('anterior')}
-                    onMouseLeave={handleMouseLeave}
-                >
+        <div className="relative flex flex-col justify-center items-center space-y-8 min-h-screen bg-gray-50 py-10 px-4">
+            <div className="flex justify-center space-x-8 w-full max-w-6xl">
+                <div className="flex-1 flex justify-center">
                     <Model
                         data={anteriorData}
-                        style={{ width: '30rem', padding: '5rem', outline: '1px solid rgba(255, 255, 255, 0.5)' }}
+                        type="anterior"
+                        style={{ width: '30rem', padding: '5rem' }}
                         onClick={handleClick}
-                        highlightedColors={hoveredMuscle === 'anterior' ? ['rgba(255, 0, 0, 0.5)'] : []}
+                        highlightedColors={hoveredMuscle ? ['#ffcccc'] : ['#b6bdc3']} // Default to gray if not hovered
                     />
                 </div>
-                <div
-                    className="flex-1 flex justify-center"
-                    onMouseEnter={() => handleMouseEnter('posterior')}
-                    onMouseLeave={handleMouseLeave}
-                >
+                <div className="flex-1 flex justify-center">
                     <Model
                         data={posteriorData}
-                        style={{ width: '30rem', padding: '5rem', outline: '1px solid rgba(255, 255, 255, 0.5)' }}
+                        type="posterior"
+                        style={{ width: '30rem', padding: '5rem' }}
                         onClick={handleClick}
-                        highlightedColors={hoveredMuscle === 'posterior' ? ['rgba(255, 0, 0, 0.5)'] : []}
+                        highlightedColors={hoveredMuscle ? ['#ffcccc'] : ['#b6bdc3']} // Default to gray if not hovered
                     />
                 </div>
             </div>
-            <div className="p-2 m-4 max-w-sm bg-white rounded-lg shadow-md border border-gray-200 flex items-center">
-                <div>
-                    <h2 className="text-lg font-semibold mb-2 text-center">How to Use the Muscle Map</h2>
-                    <ul className="list-disc list-inside text-sm text-center">
+            <div id='description' className="relative p-6 w-full max-w-2xl bg-white rounded-lg shadow-lg flex items-start border border-gray-200 mt-8">
+                <div className="absolute top-0 left-0 w-full h-10 bg-blue-600 rounded-t-lg"></div>
+                <div className="pt-12 w-full">
+                    <h2 className="text-lg font-semibold mb-2">How to Use the Muscle Map</h2>
+                    <ul className="list-disc list-inside text-sm">
                         <li>Hover over a muscle to highlight it.</li>
                         <li>Click on a muscle to view exercises for that muscle.</li>
                     </ul>
                 </div>
             </div>
-            {clickedMuscle && (
-                <div className="absolute bg-white p-2 border rounded shadow-md z-20">
-                    {clickedMuscle} muscle was clicked.
-                </div>
-            )}
         </div>
     );
 };

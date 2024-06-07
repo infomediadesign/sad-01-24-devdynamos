@@ -8,7 +8,7 @@ import LogWorkout from './components/LogWorkout';
 import ProgressChart from './components/ProgressChart';
 import HomePage from './components/HomePage';
 import AuthForm from './components/AuthForm';
-import Dashboard from './components/Dashboard';
+// import Dashboard from './components/Dashboard';
 
 const AppRoutes: React.FC = () => (
     <Router>
@@ -16,7 +16,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/" element={<App />} />
             <Route path="home" element={<HomePage />} />
             <Route path="login" element={<AuthForm />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            {/* <Route path="dashboard" element={<Dashboard />} /> */}
             <Route path="muscle-groups" element={<MuscleGroupMap />} /> {/* Assuming this is your index route */}
             <Route path="exercises/:muscleGroup" element={<Exercises />} />
             <Route path="set-goal" element={<SetGoal />} />
