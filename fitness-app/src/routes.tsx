@@ -8,6 +8,7 @@ import LogWorkout from './components/LogWorkout';
 import ProgressChart from './components/ProgressChart';
 import HomePage from './components/HomePage';
 import AuthForm from './components/AuthForm';
+import WorkoutRoutine from './components/WorkoutRoutine';
 // import Dashboard from './components/Dashboard';
 
 const AppRoutes: React.FC = () => (
@@ -22,6 +23,7 @@ const AppRoutes: React.FC = () => (
             <Route path="set-goal" element={<SetGoal />} />
             <Route path="log-workout/:id" element={<LogWorkout />} />
             <Route path="progress/:id" element={<ProgressChart />} />
+            <Route path='routines'element={<WorkoutRoutine/>}/>
         </Routes>
     </Router>
 );
