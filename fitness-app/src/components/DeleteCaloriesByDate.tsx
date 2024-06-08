@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getCaloriesByDate } from '../services/calorieServices';
+import { getCaloriesByDate, deleteCaloriesByDate } from '../services/calorieServices';
 
 const GetCaloriesByDate: React.FC = () => {
   const [date, setDate] = useState('');
@@ -20,9 +20,23 @@ const GetCaloriesByDate: React.FC = () => {
     }
   };
 
+  const handleDeleteCaloriesByDate = async () => {
+    try {
+      const data = await deleteCaloriesByDate(date);
+      setMessage('Calories log deleted successfully');
+      setCalories(null);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      } else {
+        setMessage('Unexpected error');
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Get Calories by Date</h2>
+      <h2 className="text-2xl font-bold mb-4">Delete Calories by Date</h2>
       <input
         type="text"
         value={date}
@@ -32,10 +46,18 @@ const GetCaloriesByDate: React.FC = () => {
       />
       <button
         onClick={fetchCaloriesByDate}
-        className="w-full p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+        className="w-full p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 mb-4"
       >
         Fetch Calories
       </button>
+      {calories !== null && (
+        <button
+          onClick={handleDeleteCaloriesByDate}
+          className="w-full p-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+        >
+          Delete Calories
+        </button>
+      )}
       {message && <p className="mt-4 text-red-500">{message}</p>}
       {calories !== null && <p className="mt-4">Calories for {date}: {calories}</p>}
     </div>
