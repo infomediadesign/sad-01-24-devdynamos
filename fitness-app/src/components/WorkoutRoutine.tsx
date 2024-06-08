@@ -38,7 +38,7 @@ const WorkoutRoutine: React.FC = () => {
     setError(null);
     try {
       const routineData = await generateWorkoutRoutine({ gender, age, goal, fitnessLevel, equipment });
-      console.log(routineData)
+      console.log(routineData);
       const parsedRoutine = JSON.parse(routineData);
       setRoutine(parsedRoutine);
     } catch (err) {
@@ -158,14 +158,14 @@ const WorkoutRoutine: React.FC = () => {
         {Object.keys(routine).length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Your Workout Routine</h2>
-            <table className="min-w-full bg-white">
+            <table className="min-w-full bg-white border border-gray-200">
               <thead>
                 <tr>
-                  <th className="py-2 px-4 bg-gray-200">Day</th>
-                  <th className="py-2 px-4 bg-gray-200">Exercise</th>
-                  <th className="py-2 px-4 bg-gray-200">Sets</th>
-                  <th className="py-2 px-4 bg-gray-200">Reps</th>
-                  <th className="py-2 px-4 bg-gray-200">Rest Time</th>
+                  <th className="py-2 px-4 bg-gray-200 border border-gray-300">Day</th>
+                  <th className="py-2 px-4 bg-gray-200 border border-gray-300">Exercise</th>
+                  <th className="py-2 px-4 bg-gray-200 border border-gray-300">Sets</th>
+                  <th className="py-2 px-4 bg-gray-200 border border-gray-300">Reps</th>
+                  <th className="py-2 px-4 bg-gray-200 border border-gray-300">Rest Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -173,19 +173,19 @@ const WorkoutRoutine: React.FC = () => {
                   <React.Fragment key={index}>
                     {details.rest ? (
                       <tr>
-                        <td className="border px-4 py-2">{details.day}</td>
+                        <td className="border px-4 py-2 font-bold">{details.day}</td>
                         <td className="border px-4 py-2" colSpan={4}>Rest Day</td>
                       </tr>
                     ) : (
                       details.exercises?.map((exercise, exerciseIndex) => (
                         <tr key={exerciseIndex}>
                           {exerciseIndex === 0 && details.exercises && (
-                            <td className="border px-4 py-2" rowSpan={details.exercises.length}>{details.day}</td>
+                            <td className="border px-4 py-2 font-bold" rowSpan={details.exercises.length}>{details.day}</td>
                           )}
                           <td className="border px-4 py-2">{exercise.name}</td>
-                          <td className="border px-4 py-2">{exercise.sets}</td>
-                          <td className="border px-4 py-2">{exercise.reps}</td>
-                          <td className="border px-4 py-2">{exercise.rest}</td>
+                          <td className="border px-4 py-2 text-center">{exercise.sets}</td>
+                          <td className="border px-4 py-2 text-center">{exercise.reps}</td>
+                          <td className="border px-4 py-2 text-center">{exercise.rest}</td>
                         </tr>
                       ))
                     )}
