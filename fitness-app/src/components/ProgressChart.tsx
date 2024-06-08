@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 import 'chart.js/auto';  // Automatically registers all necessary components for Chart.js
 import { fetchProgress, Progress } from '../services/progressService';
 
-const ProgressChart: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface ProgressChartProps {
+  goalId: string;
+}
+
+const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [chartData, setChartData] = useState<any>(null);
   const [workoutTypeData, setWorkoutTypeData] = useState<any>(null);
@@ -14,7 +16,7 @@ const ProgressChart: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const progressData: Progress = await fetchProgress(id || '60d21b4667d0d8992e610c85');  // Use mock ID for testing
+        const progressData: Progress = await fetchProgress(goalId);  // Use goal ID for fetching progress
         setProgress(progressData);
 
         // Data for main activity progress (Doughnut chart)
@@ -70,7 +72,7 @@ const ProgressChart: React.FC = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [goalId]);
 
   if (!progress) return <p>Loading...</p>;
 

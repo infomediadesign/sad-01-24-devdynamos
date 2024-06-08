@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { logWorkout, Log } from '../services/progressService';
 
-const LogWorkout: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface LogWorkoutProps {
+  goalId: string | null;
+}
+
+const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId }) => {
   const [formData, setFormData] = useState<Log>({
     date: '',
     value: 0,
@@ -20,8 +22,12 @@ const LogWorkout: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!goalId) {
+      setMessage('Please set a goal first.');
+      return;
+    }
     try {
-      await logWorkout(id || '60d21b4667d0d8992e610c85', formData);  // Use mock ID for testing
+      await logWorkout(goalId, formData);  // Use goal ID
       setMessage('Workout logged successfully!');
     } catch (error: any) {
       setMessage(error.message);
@@ -29,8 +35,7 @@ const LogWorkout: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-md rounded-lg overflow-hidden mt-40 p-6">
-      <h2 className="text-3xl font-bold text-blue-600 mb-4">Log Workout</h2>
+    <div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <select
           name="activityType"

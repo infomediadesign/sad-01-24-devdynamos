@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { setGoal, Goal } from '../services/progressService';
 
-const SetGoal: React.FC = () => {
-  const [formData, setFormData] = useState<Goal>({
+interface SetGoalProps {
+  onGoalSet: (id: string) => void;
+}
+
+const SetGoal: React.FC<SetGoalProps> = ({ onGoalSet }) => {
+  const [formData, setFormData] = useState<Omit<Goal, 'id'>>({
     activityType: '',
     goal: 0,
     endDate: ''
@@ -19,16 +23,16 @@ const SetGoal: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await setGoal(formData);
+      const goal = await setGoal(formData);
       setMessage('Goal set successfully!');
+      onGoalSet(goal.id); // Pass goal ID to parent component
     } catch (error: any) {
       setMessage(error.message);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-md rounded-lg overflow-hidden mt-40 p-6">
-      <h2 className="text-3xl font-bold text-blue-600 mb-4">Set Your Goal</h2>
+    <div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <select
           name="activityType"

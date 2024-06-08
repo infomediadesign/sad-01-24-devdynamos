@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5000/api';
 
 export interface Goal {
+  id: string;  // Add id field
   activityType: string;
   goal: number;
   endDate: string;
@@ -11,7 +12,7 @@ export interface Goal {
 export interface Log {
   date: string;
   value: number;
-  activityType: string;
+  activityType: string; // Add activityType to Log
 }
 
 export interface Progress {
@@ -38,12 +39,13 @@ const mockProgressData: Progress = {
   ]
 };
 
-export const setGoal = async (goal: Goal) => {
+export const setGoal = async (goal: Omit<Goal, 'id'>): Promise<Goal> => {
   // Mock Response for Testing
   return new Promise<Goal>((resolve) => {
     setTimeout(() => {
-      console.log('Goal set:', goal);
-      resolve(goal);
+      const newGoal = { ...goal, id: 'new_goal_id' };  // Add id to the new goal
+      console.log('Goal set:', newGoal);
+      resolve(newGoal);
     }, 500);
   });
 };
