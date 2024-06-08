@@ -27,10 +27,16 @@ const SetGoal: React.FC = () => {
   };
 
   return (
-    <div className="set-goal-container">
-      <h2>Set Your Goal</h2>
-      <form onSubmit={handleSubmit} className="form-container">
-        <select name="activityType" value={formData.activityType} onChange={handleChange} required>
+    <div className="max-w-md mx-auto bg-white shadow-md rounded-lg overflow-hidden mt-40 p-6">
+      <h2 className="text-3xl font-bold text-blue-600 mb-4">Set Your Goal</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <select
+          name="activityType"
+          value={formData.activityType}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+        >
           <option value="">Select Activity</option>
           <option value="walking">Walking</option>
           <option value="running">Running</option>
@@ -44,6 +50,7 @@ const SetGoal: React.FC = () => {
           value={formData.goal}
           onChange={handleChange}
           required
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
         />
         <input
           type="date"
@@ -51,10 +58,16 @@ const SetGoal: React.FC = () => {
           value={formData.endDate}
           onChange={handleChange}
           required
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
         />
-        <button type="submit">Set Goal</button>
+        <button
+          type="submit"
+          className="w-full p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+        >
+          Set Goal
+        </button>
       </form>
-      {message && <p>{message}</p>}
+      {message && <p className="mt-4 text-center text-green-600">{message}</p>}
     </div>
   );
 };

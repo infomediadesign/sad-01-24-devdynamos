@@ -11,6 +11,7 @@ export interface Goal {
 export interface Log {
   date: string;
   value: number;
+  activityType: string;
 }
 
 export interface Progress {
@@ -28,12 +29,12 @@ const mockProgressData: Progress = {
   goal: 50,
   endDate: '2023-12-31',
   logs: [
-    { date: '2023-05-01', value: 5 },
-    { date: '2023-05-02', value: 7 },
-    { date: '2023-05-03', value: 10 },
-    { date: '2023-05-04', value: 12 },
-    { date: '2023-05-05', value: 0 },
-    { date: '2023-05-06', value: 3 },
+    { date: '2023-05-01', value: 5, activityType: 'Running' },
+    { date: '2023-05-02', value: 7, activityType: 'Cycling' },
+    { date: '2023-05-03', value: 10, activityType: 'Swimming' },
+    { date: '2023-05-04', value: 12, activityType: 'Walking' },
+    { date: '2023-05-05', value: 0, activityType: 'Running' },
+    { date: '2023-05-06', value: 3, activityType: 'Cycling' },
   ]
 };
 
