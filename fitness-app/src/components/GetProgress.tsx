@@ -6,6 +6,8 @@ import BackButton from './common/BackButton';
 const GetProgress: React.FC = () => {
   const [progress, setProgress] = useState<any[]>([]);
   const [message, setMessage] = useState('');
+  const [selectedGoal, setSelectedGoal] = useState<any | null>(null);
+  const [activeGoal, setActiveGoal] = useState<any | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,9 +42,11 @@ const GetProgress: React.FC = () => {
       setProgress(data);
       setMessage('');
 
+      const currentGoal = data.find((goal: any) => new Date(goal.end_date) > new Date());
+      setActiveGoal(currentGoal);
+
       // Clear the output after 3 seconds
       setTimeout(() => {
-        setProgress([]);
         setMessage('');
       }, 3000);
     } catch (error: unknown) {
@@ -57,6 +61,10 @@ const GetProgress: React.FC = () => {
         setMessage('');
       }, 3000);
     }
+  };
+
+  const handleGoalSelect = (goal: any) => {
+    setSelectedGoal(goal);
   };
 
   return (
@@ -80,19 +88,43 @@ const GetProgress: React.FC = () => {
           Fetch Progress
         </button>
         {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
-        {progress.length > 0 && (
-          <ul className="mt-4 space-y-2">
-            {progress.map((item, index) => (
-              <li key={index} className="p-3 border border-gray-300 rounded-lg bg-white">
-                <p><strong>Goal:</strong> {item.goal}</p>
-                <p><strong>Calories Burned:</strong> {item.calories_burned}</p>
-                <p><strong>Activity:</strong> {item.activity}</p>
-                <p><strong>Start Date:</strong> {item.start_date}</p>
-                <p><strong>End Date:</strong> {item.end_date}</p>
-              </li>
-            ))}
-          </ul>
+        
+        {activeGoal && (
+          <div className="mb-4 p-3 border border-green-800 rounded-lg bg-white">
+            <h3 className="text-lg font-bold">Active Goal</h3>
+            <p><strong>Goal:</strong> {activeGoal.goal}</p>
+            <p><strong>Calories Burned:</strong> {activeGoal.calories_burned}</p>
+            <p><strong>Activity:</strong> {activeGoal.activity}</p>
+            <p><strong>Start Date:</strong> {activeGoal.start_date}</p>
+            <p><strong>End Date:</strong> {activeGoal.end_date}</p>
+          </div>
         )}
+
+        {progress.length > 0 && (
+          <div className="w-full">
+            <select
+              onChange={(e) => handleGoalSelect(progress[e.target.selectedIndex - 1])}
+              className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mb-4"
+            >
+              <option value="">Select a goal to see details</option>
+              {progress.map((item, index) => (
+                <option key={index} value={index}>
+                  {item.goal}
+                </option>
+              ))}
+            </select>
+            {selectedGoal && (
+              <div className="p-3 border border-gray-300 rounded-lg bg-white">
+                <p><strong>Goal:</strong> {selectedGoal.goal}</p>
+                <p><strong>Calories Burned:</strong> {selectedGoal.calories_burned}</p>
+                <p><strong>Activity:</strong> {selectedGoal.activity}</p>
+                <p><strong>Start Date:</strong> {selectedGoal.start_date}</p>
+                <p><strong>End Date:</strong> {selectedGoal.end_date}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         <BackButton className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mt-2" />
       </div>
     </div>
