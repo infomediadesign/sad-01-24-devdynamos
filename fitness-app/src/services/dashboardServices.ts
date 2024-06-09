@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiError } from '../components/types'; // Ensure this path is correct based on your project structure
+import { ApiError } from '../components/types'; 
 
 const API_BASE_URL = 'http://127.0.0.1:5000/dashboard';
 
