@@ -18,22 +18,22 @@ const Navbar: React.FC = () => {
                     </button>
                     {isCalorieTrackerOpen && (
                         <div className="pl-4 space-y-2">
-                            <Link to="/goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                            <Link to="/cal-goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Set Your Calorie Goal
                             </Link>
-                            <Link to="/log" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                            <Link to="/log-cal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Log Calories
                             </Link>
-                            <Link to="/progress" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                            <Link to="/progress-cal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Check your progress
                             </Link>
                             <Link to="/calories_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Calories by date
                             </Link>
-                            <Link to="/delete_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                            <Link to="/delete_cal_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Delete Calories by date
                             </Link>
-                            <Link to="/delete_goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                            <Link to="/delete_cal_goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                                 Delete Goal
                             </Link>
                         </div>
