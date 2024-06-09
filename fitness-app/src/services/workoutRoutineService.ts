@@ -11,7 +11,7 @@ interface WorkoutInput {
 
 
 const openai = new OpenAI({
-apiKey:"sk-proj-axNxl5zsSyWyIMIQ796WT3BlbkFJIEXSqMRRsf6MmrlfHdgM",
+apiKey:"",
 dangerouslyAllowBrowser: true
 });
 
@@ -61,3 +61,6 @@ export const generateWorkoutRoutine = async (input: WorkoutInput): Promise<strin
   const workoutRoutine:any = response.choices[0].message.content;
   return workoutRoutine
 };
+
+
+
