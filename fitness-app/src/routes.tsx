@@ -1,30 +1,3 @@
-// import React from 'react';
-// import { Routes, Route } from 'react-router-dom';
-// import AuthForm from './components/AuthForm';
-// import SetCalorieGoal from './components/SetCalorieGoal';
-// import LogCalories from './components/LogCalories';
-// import GetProgress from './components/GetProgress';
-// import GetCaloriesByDate from './components/GetCaloriesByDate';
-// import DeleteCaloriesByDate from './components/DeleteCaloriesByDate';
-// import DeleteGoal from './components/DeleteGoal';
-// import Dashboard from './components/Dashboard';
-
-// const AppRoutes: React.FC = () => {
-//   return (
-//     <Routes>
-//       <Route path="/" element={<AuthForm onLogin={(token) => console.log("Logged in with token:", token)} />} />
-//       <Route path="/dashboard" element={<Dashboard username="" />} />
-//       <Route path="/goal" element={<SetCalorieGoal />} />
-//       <Route path="/log" element={<LogCalories />} />
-//       <Route path="/progress" element={<GetProgress />} />
-//       <Route path="/calories_bydate" element={<GetCaloriesByDate />} />
-//       <Route path="/delete_bydate" element={<DeleteCaloriesByDate />} />
-//       <Route path="/delete_goal" element={<DeleteGoal />} />
-//     </Routes>
-//   );
-// };
-
-// export default AppRoutes;
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Calories from './components/Calories';
