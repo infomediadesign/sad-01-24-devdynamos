@@ -20,7 +20,7 @@
 
 // const logCalories = async (data: { date: string; calories: number }) => {
 //   try {
-//     const response = await axios.post(`${API_URL}/log`, data, {
+//     const response = await axios.post(API_URL, data, {
 //       headers: {
 //         Authorization: `Bearer ${localStorage.getItem('token')}`
 //       }
@@ -52,7 +52,7 @@
 
 // const getCaloriesByDate = async (date: string) => {
 //   try {
-//     const response = await axios.get(`${API_URL}/calories_bydate`, {
+//     const response = await axios.get(API_URL, {
 //       headers: {
 //         Authorization: `Bearer ${localStorage.getItem('token')}`
 //       },
@@ -69,7 +69,7 @@
 
 // const deleteCaloriesByDate = async (date: string) => {
 //   try {
-//     const response = await axios.delete(`${API_URL}/delete_bydate`, {
+//     const response = await axios.delete(API_URL, {
 //       headers: {
 //         Authorization: `Bearer ${localStorage.getItem('token')}`
 //       },
@@ -110,7 +110,8 @@ const setCalorieGoal = async (data: { start_date: string; end_date: string; goal
   try {
     const response = await axios.post(`${API_URL}/goal`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       }
     });
     return response.data;
@@ -126,7 +127,8 @@ const logCalories = async (data: { date: string; calories: number }) => {
   try {
     const response = await axios.post(API_URL, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       }
     });
     return response.data;
@@ -142,7 +144,8 @@ const getProgress = async () => {
   try {
     const response = await axios.get(`${API_URL}/progress`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       }
     });
     return response.data;
@@ -158,7 +161,8 @@ const getCaloriesByDate = async (date: string) => {
   try {
     const response = await axios.get(API_URL, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       },
       params: { date }
     });
@@ -175,7 +179,8 @@ const deleteCaloriesByDate = async (date: string) => {
   try {
     const response = await axios.delete(API_URL, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       },
       params: { date }
     });
@@ -192,7 +197,8 @@ const deleteGoal = async (start_date: string, end_date: string) => {
   try {
     const response = await axios.delete(`${API_URL}/goals`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Username: localStorage.getItem('username') // Add username to headers
       },
       params: { start_date, end_date }
     });

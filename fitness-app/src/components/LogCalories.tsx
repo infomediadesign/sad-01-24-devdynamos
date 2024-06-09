@@ -1,75 +1,7 @@
-// import React, { useState } from 'react';
-// import DatePicker from 'react-datepicker';
-// import 'react-datepicker/dist/react-datepicker.css';
-// import { logCalories } from '../services/calorieServices';
-// import { format } from 'date-fns';
-
-// const LogCalories: React.FC = () => {
-//   const [date, setDate] = useState<Date | null>(null);
-//   const [calories, setCalories] = useState<number | string>('');
-//   const [message, setMessage] = useState('');
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     try {
-//       const formattedDate = date ? format(date, 'dd-MM-yyyy') : '';
-//       const data = await logCalories({ date: formattedDate, calories: Number(calories) });
-//       setMessage(data.message);
-//     } catch (error: unknown) {
-//       if (error instanceof Error) {
-//         setMessage(error.message);
-//       } else {
-//         setMessage('Unexpected error');
-//       }
-//     }
-//   };
-
-//   const handleCaloriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const value = e.target.value;
-//     if (value === '' || /^[0-9\b]+$/.test(value)) {
-//       setCalories(value);
-//     }
-//   };
-
-//   return (
-//     <div className="container mx-auto p-4 max-w-md">
-//       <h2 className="text-2xl font-bold mb-4 text-center">Log Calories</h2>
-//       <form onSubmit={handleSubmit} className="space-y-4">
-//         <div className="flex justify-center">
-//           <DatePicker
-//             selected={date}
-//             onChange={(date: Date | null) => setDate(date)}
-//             dateFormat="dd-MM-yyyy"
-//             placeholderText="Date (dd-mm-yyyy)"
-//             className="w-full p-2 border border-gray-300 rounded-lg"
-//           />
-//         </div>
-//         <input
-//           type="text"
-//           value={calories}
-//           onChange={handleCaloriesChange}
-//           placeholder="Calories"
-//           className="w-full p-2 border border-gray-300 rounded-lg"
-//         />
-//         <button
-//           type="submit"
-//           className="w-full p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
-//         >
-//           Log Calories
-//         </button>
-//       </form>
-//       <p className="mt-4 text-center">{message}</p>
-//     </div>
-//   );
-// };
-
-// export default LogCalories;
-
-
-
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 import { logCalories } from '../services/calorieServices';
 import BackButton from './common/BackButton';
 import { format } from 'date-fns';
@@ -91,6 +23,9 @@ const LogCalories: React.FC = () => {
   const [calories, setCalories] = useState<string>('');
   const [message, setMessage] = useState('');
 
+  const navigate = useNavigate();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -102,12 +37,12 @@ const LogCalories: React.FC = () => {
       });
       setMessage(data.message);
 
-      // Clear the form after 2-3 seconds
+      // Clear the form
       setTimeout(() => {
         setDate(null);
         setCalories('');
         setMessage('');
-      }, 2500); // 2500 milliseconds = 2.5 seconds
+      }, 10000); // 10 seconds timeout
     } catch (error: unknown) {
       if (error instanceof Error) {
         setMessage(error.message);
@@ -123,6 +58,33 @@ const LogCalories: React.FC = () => {
       setCalories(value);
     }
   };
+
+  const resetTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      navigate('/dashboard');
+    }, 10000); // 10000 milliseconds = 10 seconds
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleActivity = () => resetTimeout();
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keypress', handleActivity);
+
+    // Set initial timeout
+    resetTimeout();
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keypress', handleActivity);
+    };
+  }, [resetTimeout]);
 
   return (
     <div

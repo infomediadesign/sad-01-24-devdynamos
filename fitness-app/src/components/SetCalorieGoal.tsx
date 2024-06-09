@@ -1,6 +1,7 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 import { setCalorieGoal } from '../services/calorieServices';
 import BackButton from './common/BackButton';
 import { format, addDays } from 'date-fns';
@@ -23,6 +24,9 @@ const SetCalorieGoal: React.FC = () => {
   const [goal, setGoal] = useState<string>('');
   const [activity, setActivity] = useState('');
   const [message, setMessage] = useState('');
+
+  const navigate = useNavigate();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +74,33 @@ const SetCalorieGoal: React.FC = () => {
       setGoal(value);
     }
   };
+
+  const resetTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      navigate('/dashboard');
+    }, 10000); //10 seconds timeout
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleActivity = () => resetTimeout();
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keypress', handleActivity);
+
+    // Set initial timeout
+    resetTimeout();
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keypress', handleActivity);
+    };
+  }, [resetTimeout]);
 
   return (
     <div
