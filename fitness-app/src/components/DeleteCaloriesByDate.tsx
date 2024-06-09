@@ -67,7 +67,7 @@ const GetCaloriesByDate: React.FC = () => {
       setDate(null);
       setCalories(null);
       setMessage('');
-    }, 5000);
+    }, 10000);
 
     return () => clearTimeout(clearDateTimeout);
   }, [date]);
@@ -75,7 +75,7 @@ const GetCaloriesByDate: React.FC = () => {
   useEffect(() => {
     const navigateTimeout = setTimeout(() => {
       navigate('/dashboard');
-    }, 60000);
+    }, 20000);
 
     const handleActivity = () => {
       clearTimeout(navigateTimeout);
@@ -117,7 +117,7 @@ const GetCaloriesByDate: React.FC = () => {
           />
           <button
             onClick={fetchCaloriesByDate}
-            className="w-full p-3 rounded-lg bg-blue-500 text-white font-bold hover:bg-blue-600"
+            className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mt-2"
           >
             Fetch Calories
           </button>
