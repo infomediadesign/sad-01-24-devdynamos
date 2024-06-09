@@ -1,37 +1,50 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Logout from './Logout';
 
-const NavBar: React.FC = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+const Navbar: React.FC = () => {
+    const [isCalorieTrackerOpen, setIsCalorieTrackerOpen] = useState(false);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+    const toggleCalorieTracker = () => {
+        setIsCalorieTrackerOpen(!isCalorieTrackerOpen);
     };
 
     return (
-        <div className="flex">
-            <aside className={`bg-gray-800 text-white w-full md:w-1/4 min-h-screen p-4 ${isSidebarOpen ? 'block' : 'hidden'}`}>
-                {/* Sidebar content goes here */}
-                <h2 className="text-xl font-semibold mb-4">Menu</h2>
-                <ul className="space-y-2">
-                    <li>
-                        <Link to="/calorie-tracker">Calorie Tracker</Link>
-                    </li>
-                    <li>
-                        <Link to="/exercise-progress">Exercise Progress Tracker</Link>
-                    </li>
-                    <li>
-                        <Link to="/muscle-wiki">Muscle Wiki</Link>
-                    </li>
-                </ul>
-            </aside>
-            <nav className="bg-blue-500 p-4 flex-grow">
-                <button onClick={toggleSidebar} className="text-white">
-                    {isSidebarOpen ? 'Close' : 'Open'} Menu
-                </button>
-            </nav>
-        </div>
+        <nav className="bg-gray-800 h-screen w-64 flex flex-col justify-between p-4">
+            <div className="text-white text-lg font-semibold space-y-4">
+                <div>
+                    <button onClick={toggleCalorieTracker} className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 w-full text-left">
+                        Calorie Tracker
+                    </button>
+                    {isCalorieTrackerOpen && (
+                        <div className="pl-4 space-y-2">
+                            <Link to="/goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Set Your Calorie Goal
+                            </Link>
+                            <Link to="/log" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Log Calories
+                            </Link>
+                            <Link to="/progress" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Check your progress
+                            </Link>
+                            <Link to="/calories_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Calories by date
+                            </Link>
+                            <Link to="/delete_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Delete Calories by date
+                            </Link>
+                            <Link to="/delete_goal" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                                Delete Goal
+                            </Link>
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div>
+                <Logout />
+            </div>
+        </nav>
     );
 };
 
-export default NavBar;
+export default Navbar;

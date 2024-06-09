@@ -4,6 +4,7 @@ import bcrypt, jwt, datetime, re
 from flasgger import Swagger
 from flask_cors import CORS
 from config import Config
+from flasgger import swag_from
 from functools import wraps
 from calories_tracker import init_calories_routes
 from workouts import init_workouts_routes
