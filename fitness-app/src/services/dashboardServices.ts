@@ -13,7 +13,7 @@ export const getCalories = async (token: string) => {
     return response.data;
   } catch (error: unknown) {
     const typedError = error as ApiError; // Use type assertion
-    // Check each level of the object to avoid accessing properties of undefined
+    //Check each level of the object to avoid accessing properties of undefined
     if (typedError.response && typedError.response.data && typedError.response.data.error) {
       throw typedError.response.data.error;
     } else {
