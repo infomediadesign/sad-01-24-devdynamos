@@ -5,7 +5,7 @@ import Navbar from './common/NavBar';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 
-const API_URL = 'http://127.0.0.1:5000';  // Replace with your actual API URL
+const API_URL = 'http://127.0.0.1:5000';  
 
 const fetchProgress = async () => {
   try {
