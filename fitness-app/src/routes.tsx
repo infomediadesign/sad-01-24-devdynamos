@@ -12,6 +12,7 @@ import DeleteCaloriesByDate from './components/DeleteCaloriesByDate';
 import DeleteGoal from './components/DeleteGoal';
 import HomePage from './components/HomePage';
 
+
 const AppRoutes: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
@@ -25,17 +26,17 @@ const AppRoutes: React.FC = () => {
         <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<AuthForm onLogin={handleLogin} />} />
-        <Route path="/dashboard/*" element={token ? <Dashboard /> : <Navigate to="/dashboard" />}>
+        <Route path="/dashboard/:username/*" element={token ? <Dashboard /> : <Navigate to="/dashboard" />}>
           <Route path="progress" element={<Progress />} />
           <Route path="calories" element={<Calories />} />
         </Route>
-          <Route path="/goal" element={<SetCalorieGoal />} />
-          <Route path="/log" element={<LogCalories />} />
-          <Route path="/progress" element={<GetProgress />} />
-          <Route path="/calories_bydate" element={<GetCaloriesByDate />} />
-          <Route path="/delete_bydate" element={<DeleteCaloriesByDate />} />
-          <Route path="/delete_goal" element={<DeleteGoal />} />
-        </Routes>
+        <Route path="/goal"element={ token ? <SetCalorieGoal /> : <Navigate to= "/"/>} ></Route>
+        <Route path="/log" element={ token ? <LogCalories /> : <Navigate to= "/" />}></Route>
+        <Route path="/progress" element={token ? <GetProgress /> : <Navigate to= "/" />}></Route>
+        <Route path="/calories_bydate" element={token ? <GetCaloriesByDate /> : <Navigate to= "/" />}></Route>
+        <Route path="/delete_bydate" element={token ? <DeleteCaloriesByDate /> : <Navigate to ="/" />}></Route>
+        <Route path="/delete_goal" element={token ? <DeleteGoal /> : <Navigate to ="/" />}></Route>
+      </Routes>
       </div>
     
   );
