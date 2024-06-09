@@ -260,7 +260,7 @@ def init_admin_routes(app, mongo):
     
     @admin_bp.route('/users/<string:user_id>', methods=['PUT'])
     @swag_from({
-        "tags": ["AdminManageUser"],
+        "tags": ["Admin"],
         "summary": "Update user details",
         "security": [{"Bearer": []}],
         "parameters": [

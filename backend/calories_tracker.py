@@ -5,15 +5,11 @@ from config import Config
 from functools import wraps
 from flasgger import swag_from
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
 calories_bp = Blueprint('calories', __name__)
 
 def init_calories_routes(app, mongo):
     users_collection = mongo.db.users
     calories_tracker_collection = mongo.db.calories_tracker
-    daily_calories_log_collection = mongo.db.daily_calories_log
 
     def auth_required(f):
         @wraps(f)
@@ -449,10 +445,3 @@ def init_calories_routes(app, mongo):
         return jsonify({"message": "Goal deleted successfully"}), 200
     
     app.register_blueprint(calories_bp, url_prefix='/calories')
-
-if __name__ == "__main__":
-    from flask_pymongo import PyMongo
-    app.config["MONGO_URI"] = Config.MONGO_URI
-    mongo = PyMongo(app)
-    init_calories_routes(app, mongo)
-    app.run(debug=True)
