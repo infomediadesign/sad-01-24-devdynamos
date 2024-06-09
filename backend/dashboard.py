@@ -16,6 +16,9 @@ def init_dashboard_routes(app, mongo):
 
     @app.before_request
     def authenticate():
+        if request.method == 'OPTIONS':
+            return '', 204  # Allow OPTIONS requests without authentication
+        
         if request.path.startswith('/dashboard'):
             token = request.headers.get('Authorization')
             if not token or not token.startswith('Bearer '):
@@ -31,6 +34,14 @@ def init_dashboard_routes(app, mongo):
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
+            
+    def parse_date(date_str):
+        for fmt in ('%Y-%m-%d', '%d-%m-%Y'):
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except ValueError:
+                continue
+        raise ValueError(f"time data {date_str} does not match any known format")
 
     @dashboard_bp.route('/calories', methods=['GET'])
     @swag_from({
@@ -67,8 +78,8 @@ def init_dashboard_routes(app, mongo):
 
         current_week_goal = None
         for goal in goals:
-            start_date = datetime.strptime(goal['start_date'], '%Y-%m-%d').date()
-            end_date = datetime.strptime(goal['end_date'], '%Y-%m-%d').date()
+            start_date = parse_date(goal['start_date'])
+            end_date = parse_date(goal['end_date'])
             if start_date <= current_date <= end_date:
                 current_week_goal = goal
                 break
@@ -83,7 +94,7 @@ def init_dashboard_routes(app, mongo):
     @dashboard_bp.route('/progress', methods=['GET'])
     @swag_from({
         'tags': ['Dashboard'],
-        "summary": "Get Current Week Calories Burned Progress",
+        "summary": "Get Current Week Progress",
         'responses': {
             200: {'description': 'Success'},
             400: {'description': 'No goals this week'},
@@ -105,8 +116,8 @@ def init_dashboard_routes(app, mongo):
 
         current_week_progress = None
         for goal in goals:
-            start_date = datetime.strptime(goal['start_date'], '%Y-%m-%d').date()
-            end_date = datetime.strptime(goal['end_date'], '%Y-%m-%d').date()
+            start_date = parse_date(goal['start_date'])
+            end_date = parse_date(goal['end_date'])
             if start_date <= current_date <= end_date:
                 total_progress = sum(entry['progress'] for entry in goal['progresses'])
                 current_week_progress = total_progress
