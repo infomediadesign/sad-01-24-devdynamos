@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000'; // Adjust the URL to your backend API
+const API_URL = 'http://127.0.0.1:5000'; 
 
 interface FormData {
   username: string;
