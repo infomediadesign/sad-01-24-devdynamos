@@ -9,7 +9,9 @@ from functools import wraps
 from calories_tracker import init_calories_routes
 from workouts import init_workouts_routes
 from progressTracking import init_progress_routes
-from dashboard import init_dashboard_routes 
+from dashboard import init_dashboard_routes
+from admin import init_admin_routes
+from userprofile import init_user_profile_routes
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -22,12 +24,14 @@ init_calories_routes(app, mongo)
 init_workouts_routes(app, mongo)
 init_progress_routes(app, mongo)
 init_dashboard_routes(app, mongo)
+init_admin_routes(app, mongo)
+init_user_profile_routes(app, mongo)
 
 swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "Exercise API",
-        "description": "API to get exercises by body part.",
+        "title": "Fitness Tracking System",
+        "description": "API to get access to features of Application.",
         "version": "1.0.0"
     },
     "host": "localhost:5000",  
@@ -108,7 +112,7 @@ def create_user():
         return jsonify({"error": "Email already exists"}), 400
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    user_data = {'username': username, 'password': hashed_password, 'email': email, 'age': age, 'created_at': datetime.datetime.utcnow()}
+    user_data = {'username': username, 'password': hashed_password, 'email': email, 'age': age, 'created_at': datetime.datetime.utcnow(), 'hasRole' : 'default'}
     users_collection.insert_one(user_data)
     return jsonify({"message": "User created successfully"}), 201
 
@@ -147,7 +151,9 @@ def login():
         return jsonify({"error": "Invalid username or password"}), 400
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        userData = users_collection.find_one({'username' : user['username']})
+        print("USERNAME :: ", userData['hasRole'])
+        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30), "sub": "fitnessTrackingSystem", "hasRole" : userData['hasRole']}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         session_data = sessions_collection.find_one({'username': username})
         if session_data:
@@ -177,9 +183,12 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
-            session_data = sessions_collection.find_one({"username": data['username'], "tokens": token})
+            session_data = sessions_collection.find_one({"username": data['username']})
             if not session_data:
-                return jsonify({'message': 'Token is invalid or session not found!'}), 401
+                return jsonify({'message': 'No active session for user {' + data['username'] + '} found!'}), 401
+            token_data = sessions_collection.find_one({"tokens": token})
+            if not token_data:
+                return jsonify({'message': 'Token is invalid '}), 401
             request.user = data['username']
         except Exception as e:
             return jsonify({'message': 'Token is invalid!'}), 401
