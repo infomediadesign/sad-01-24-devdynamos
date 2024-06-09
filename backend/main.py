@@ -9,18 +9,19 @@ from functools import wraps
 from calories_tracker import init_calories_routes
 from workouts import init_workouts_routes
 from progressTracking import init_progress_routes
+from dashboard import init_dashboard_routes 
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 mongo = PyMongo(app)
 users_collection = mongo.db.users
-blacklist_collection = mongo.db.token_blacklist
 sessions_collection = mongo.db.sessions
 
 init_calories_routes(app, mongo)
 init_workouts_routes(app, mongo)
 init_progress_routes(app, mongo)
+init_dashboard_routes(app, mongo)
 
 swagger_template = {
     "swagger": "2.0",
@@ -146,7 +147,7 @@ def login():
         return jsonify({"error": "Invalid username or password"}), 400
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30), "sub": "fitnessTrackingSystem"}, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         session_data = sessions_collection.find_one({'username': username})
         if session_data:
