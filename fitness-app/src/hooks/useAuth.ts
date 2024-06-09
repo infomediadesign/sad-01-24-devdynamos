@@ -1,20 +1,3 @@
-// import { useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-
-// const useAuth = () => {
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const jwtToken = localStorage.getItem('jwt_token'); // Update key to "jwt_token"
-//     if (!jwtToken) {
-//       navigate('/');
-//     }
-//   }, [navigate]);
-// };
-
-// export default useAuth;
-
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
