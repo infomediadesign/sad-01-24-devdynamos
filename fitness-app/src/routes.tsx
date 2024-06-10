@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import Calories from './components/Calories';
 import Progress from './components/Progress';
 import AuthForm from './components/AuthForm';
+import WorkoutRoutine from './components/WorkoutRoutine';
+import ProgressTracking from './components/ProgressTracking';
 import Dashboard from './components/Dashboard';
 import SetCalorieGoal from './components/SetCalorieGoal';
 import LogCalories from './components/LogCalories';
@@ -11,6 +13,8 @@ import GetCaloriesByDate from './components/GetCaloriesByDate';
 import DeleteCaloriesByDate from './components/DeleteCaloriesByDate';
 import DeleteGoal from './components/DeleteGoal';
 import HomePage from './components/HomePage';
+import MuscleGroupMap from './components/MuscleGroupMap';
+import Exercises from './components/Excercises';
 
 
 const AppRoutes: React.FC = () => {
@@ -26,17 +30,22 @@ const AppRoutes: React.FC = () => {
         <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<AuthForm onLogin={handleLogin} />} />
-        <Route path="/dashboard/:username/*" element={token ? <Dashboard /> : <Navigate to="/dashboard" />}>
-          <Route path="progress" element={<Progress />} />
+        <Route path="/dashboard/:username/*" element={token ? <Dashboard /> : <Navigate to="/dashboard/*" />}>
+          <Route path="progress-cal" element={<Progress />} />
           <Route path="calories" element={<Calories />} />
         </Route>
-        <Route path="/goal"element={ token ? <SetCalorieGoal /> : <Navigate to= "/"/>} ></Route>
-        <Route path="/log" element={ token ? <LogCalories /> : <Navigate to= "/" />}></Route>
-        <Route path="/progress" element={token ? <GetProgress /> : <Navigate to= "/" />}></Route>
-        <Route path="/calories_bydate" element={token ? <GetCaloriesByDate /> : <Navigate to= "/" />}></Route>
-        <Route path="/delete_bydate" element={token ? <DeleteCaloriesByDate /> : <Navigate to ="/" />}></Route>
-        <Route path="/delete_goal" element={token ? <DeleteGoal /> : <Navigate to ="/" />}></Route>
-      </Routes>
+        <Route path="muscle-groups" element={<MuscleGroupMap />} /> {/* Assuming this is your index route */}
+          <Route path="exercises/:muscleGroup" element={<Exercises />} />
+          <Route path="/cal-goal" element={<SetCalorieGoal />} />
+          <Route path="/log-cal" element={<LogCalories />} />
+          <Route path="/progress-cal" element={<GetProgress />} />
+          <Route path="/calories_bydate" element={<GetCaloriesByDate />} />
+          <Route path="/delete_cal_bydate" element={<DeleteCaloriesByDate />} />
+          <Route path="/delete_cal_goal" element={<DeleteGoal />} />
+          <Route path='/progressTracking' element={<ProgressTracking/>}/>
+          <Route path='/routines'element={<WorkoutRoutine/>}/>
+        </Routes>
+
       </div>
     
   );
