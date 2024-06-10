@@ -1,18 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logout from './Logout';
+import UserProfile from '../UserProfile';
+import { getUserProfile } from '../../services/userServices';
 
 const Navbar: React.FC = () => {
   const [isCalorieTrackerOpen, setIsCalorieTrackerOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
 
   const toggleCalorieTracker = () => {
     setIsCalorieTrackerOpen(!isCalorieTrackerOpen);
   };
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileData = await getUserProfile();
+        setProfile(profileData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   return (
-    <nav className="bg-gray-800 h-full w-64 fixed flex flex-col justify-between p-4">
-      <div className="text-white text-lg font-semibold space-y-4">
-      <div>
+    <nav className="bg-gray-800 h-full w-64 fixed flex flex-col justify-between p-4 text-white">
+      <div className="text-lg font-semibold space-y-4">
+        <UserProfile />
+        {profile ? (
+          <div className="mb-4">
+            <h2 className="text-xl">Welcome, {profile.username}!</h2>
+            {profile.photo && <img src={profile.photo} alt="User Photo" className="w-16 h-16 rounded-full object-cover mt-2" />}
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
+        <div>
           <button onClick={toggleCalorieTracker} className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 w-full text-left">
             Calorie Tracker
           </button>
@@ -24,7 +48,7 @@ const Navbar: React.FC = () => {
               <Link to="/log" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                 Log Calories
               </Link>
-              <Link to="progress" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+              <Link to="/progress" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
                 Check Your Progress
               </Link>
               <Link to="/calories_bydate" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
@@ -39,7 +63,7 @@ const Navbar: React.FC = () => {
             </div>
           )}
         </div>
-      <Link to="/progressTracking" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+        <Link to="/progressTracking" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
           Progress Tracking
         </Link>
         <Link to="/routines" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
@@ -48,8 +72,6 @@ const Navbar: React.FC = () => {
         <Link to="/muscle-groups" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
           Muscle Groups
         </Link>
-       
-       
       </div>
       <div>
         <Logout />
