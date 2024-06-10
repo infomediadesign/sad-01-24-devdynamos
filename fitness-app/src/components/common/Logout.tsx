@@ -20,7 +20,7 @@ const Logout: React.FC = () => {
             if (response.status === 200) {
                 localStorage.removeItem('token');
                 alert('User logged out successfully');
-                window.location.href = '/login';
+                window.location.href = '/';
             }
         } catch (error: unknown) {
             if (error instanceof Error) {

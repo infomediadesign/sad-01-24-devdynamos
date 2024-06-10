@@ -18,7 +18,7 @@ const CustomInput = forwardRef<HTMLInputElement, any>(({ value, onClick, placeho
   />
 ));
 
-const GetCaloriesByDate: React.FC = () => {
+const DeleteCaloriesByDate: React.FC = () => {
   const [date, setDate] = useState<Date | null>(null);
   const [calories, setCalories] = useState<number | null>(null);
   const [message, setMessage] = useState<string | JSX.Element>('');
@@ -142,4 +142,4 @@ const GetCaloriesByDate: React.FC = () => {
   );
 };
 
-export default GetCaloriesByDate;
+export default DeleteCaloriesByDate;

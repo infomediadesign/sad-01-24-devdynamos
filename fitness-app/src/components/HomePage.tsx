@@ -14,8 +14,8 @@ const HomePage: React.FC = () => {
                         <p className="text-xl mb-8">Your journey to a healthier life starts here. Track your workouts and calories, monitor your progress, and stay motivated.</p>
                         {!isAuthenticated && (
                             <div>
-                                <Link to="/login" className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-4">
-                                    Login
+                                <Link to="/login" className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mb-4">
+                                    Join Now
                                 </Link>
                             </div>
                         )}
@@ -34,8 +34,8 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="w-full md:w-1/3 p-4">
                             <div className="bg-white shadow-lg rounded-lg p-6">
-                                <h3 className="text-2xl font-semibold mb-4">Monitor Progress</h3>
-                                <p>Visualize your progress with detailed charts and graphs.</p>
+                                <h3 className="text-2xl font-semibold mb-4">Track Calories</h3>
+                                <p>Log your calories burnt and monitor your progress over time</p>
                             </div>
                         </div>
                         <div className="w-full md:w-1/3 p-4">
@@ -49,8 +49,8 @@ const HomePage: React.FC = () => {
             </section>
             <section className="bg-white py-20">
                 <div className="container mx-auto text-center">
-                    <h2 className="text-4xl font-bold mb-8">Community Support</h2>
-                    <p>Join a community of like-minded individuals who are also on their fitness journey. Share tips, ask for advice, and stay motivated together.</p>
+                    <h2 className="text-4xl font-bold mb-8">Guiding your path to wellness</h2>
+                    <p>Remember that the reason you are doing this to make your life better</p>
                 </div>
             </section>
         </div>
