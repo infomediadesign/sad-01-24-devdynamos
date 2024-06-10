@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Calories from './components/Calories';
 import Progress from './components/Progress';
 import AuthForm from './components/AuthForm';
@@ -25,31 +25,27 @@ const AppRoutes: React.FC = () => {
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<AuthForm onLogin={handleLogin} />} />
-      {token ? (
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="progress" element={<Progress />} />
+      <div className="min-h-screen bg-gray-100">
+        <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<AuthForm onLogin={handleLogin} />} />
+        <Route path="/dashboard/*" element={token ? <Dashboard /> : <Navigate to="/dashboard/*" />}>
+          <Route path="progress-cal" element={<Progress />} />
           <Route path="calories" element={<Calories />} />
-          <Route path="set-your-calorie-goal" element={<SetCalorieGoal />} />
-          <Route path="log-calories" element={<LogCalories />} />
-          <Route path="progressTracking" element={<ProgressTracking />} />
-          <Route path="calories-by-date" element={<GetCaloriesByDate />} />
-          <Route path="delete-calories-by-date" element={<DeleteCaloriesByDate />} />
-          <Route path="delete-goal" element={<DeleteGoal />} />
-          <Route path="cal-progress-tracking" element={<Progress />} />
-          
-          
         </Route>
-      ) : (
-        <Route path="/dashboard/*" element={<Navigate to="/login" />} />
-      )}
-      <Route path="exercises/:muscleGroup" element={<Exercises />} />
-      <Route path="/muscle-groups" element={<MuscleGroupMap />} />
-      <Route path="/routines" element={<WorkoutRoutine />} />
-      
-    </Routes>
+        <Route path="muscle-groups" element={<MuscleGroupMap />} /> {/* Assuming this is your index route */}
+          <Route path="exercises/:muscleGroup" element={<Exercises />} />
+          <Route path="/cal-goal" element={<SetCalorieGoal />} />
+          <Route path="/log-cal" element={<LogCalories />} />
+          <Route path="/progress-cal" element={<GetProgress />} />
+          <Route path="/calories_bydate" element={<GetCaloriesByDate />} />
+          <Route path="/delete_cal_bydate" element={<DeleteCaloriesByDate />} />
+          <Route path="/delete_cal_goal" element={<DeleteGoal />} />
+          <Route path='/progressTracking' element={<ProgressTracking/>}/>
+          <Route path='/routines'element={<WorkoutRoutine/>}/>
+        </Routes>
+      </div>
+    
   );
 };
 

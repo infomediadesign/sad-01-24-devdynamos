@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import Model, { IExerciseData, IMuscleStats } from 'react-body-highlighter';
 import { useNavigate } from 'react-router-dom';
+import BackButton from './common/BackButton';
 
 const anteriorData: IExerciseData[] = [
     { name: 'Bench Press', muscles: ['chest', 'triceps', 'front-deltoids'] },
@@ -76,8 +77,12 @@ const MuscleGroupMap: React.FC = () => {
                             <li>Click on a muscle to view exercises for that muscle.</li>
                         </ul>
                     </div>
+                    <div>
+        <BackButton className="w-full p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"/>
+      </div>
                 </div>
             </div>
+            
         </div>
     );
 };

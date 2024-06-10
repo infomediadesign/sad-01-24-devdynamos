@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { generateWorkoutRoutine } from '../services/workoutRoutineService';
+import BackButton from './common/BackButton';
 
 interface Exercise {
   name: string;
@@ -195,6 +196,9 @@ const WorkoutRoutine: React.FC = () => {
             </table>
           </div>
         )}
+      </div>
+      <div>
+        <BackButton className="w-full p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"/>
       </div>
     </div>
   );
