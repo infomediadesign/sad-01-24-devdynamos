@@ -6,10 +6,11 @@ interface SetGoalProps {
 }
 
 const SetGoal: React.FC<SetGoalProps> = ({ onGoalSet }) => {
-  const [formData, setFormData] = useState<Omit<Goal, 'id'>>({
+  const [formData, setFormData] = useState<Omit<Goal, 'id' | 'progresses'>>({
     activityType: '',
     goal: 0,
-    endDate: ''
+    endDate: '',
+    metrics: ''
   });
   const [message, setMessage] = useState<string>('');
 
@@ -60,6 +61,15 @@ const SetGoal: React.FC<SetGoalProps> = ({ onGoalSet }) => {
           type="date"
           name="endDate"
           value={formData.endDate}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+        />
+        <input
+          type="text"
+          name="metrics"
+          placeholder="Metrics (e.g., km, hours)"
+          value={formData.metrics}
           onChange={handleChange}
           required
           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"

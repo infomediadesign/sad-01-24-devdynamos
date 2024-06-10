@@ -1,43 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 import 'chart.js/auto';  // Automatically registers all necessary components for Chart.js
-import { fetchProgress, Progress } from '../services/progressService';
+import { Progress, Goal } from '../services/progressService';
 
 interface ProgressChartProps {
   goalId: string;
+  workoutLogged: boolean;  // Add this prop to trigger chart update
+  goals: Goal[];  // Add this prop
 }
 
-const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
-  const [progress, setProgress] = useState<Progress | null>(null);
-  const [chartData, setChartData] = useState<any>(null);
+const ProgressChart: React.FC<ProgressChartProps> = ({ goalId, workoutLogged, goals }) => {
+  const [currentGoal, setCurrentGoal] = useState<Goal | null>(null);  // Change type to Goal
+  const [currentGoalProgress, setCurrentGoalProgress] = useState<any>(null);
   const [workoutTypeData, setWorkoutTypeData] = useState<any>(null);
   const [goalProgressData, setGoalProgressData] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const progressData: Progress = await fetchProgress(goalId);  // Use goal ID for fetching progress
-        setProgress(progressData);
+        const currentGoalData = goals.find(goal => goal.id === goalId);
+        setCurrentGoal(currentGoalData || null);
 
-        // Data for main activity progress (Doughnut chart)
-        const totalProgress = progressData.logs.reduce((acc, log) => acc + log.value, 0);
-        setChartData({
-          labels: ['Progress', 'Remaining'],
-          datasets: [
-            {
-              label: `${progressData.activityType} Progress`,
-              data: [totalProgress, progressData.goal - totalProgress],
-              backgroundColor: ['#4caf50', '#e0e0e0'],
-              borderColor: ['#4caf50', '#e0e0e0'],
-              borderWidth: 1
-            }
-          ]
-        });
+        if (currentGoalData) {
+          // Data for main activity progress (Doughnut chart)
+          const totalProgress = currentGoalData.progresses.reduce((acc: number, log) => acc + log.value, 0);
+          setCurrentGoalProgress({
+            labels: ['Progress', 'Remaining'],
+            datasets: [
+              {
+                label: `${currentGoalData.activityType} Progress`,
+                data: [totalProgress, currentGoalData.goal - totalProgress],
+                backgroundColor: ['#4caf50', '#e0e0e0'],
+                borderColor: ['#4caf50', '#e0e0e0'],
+                borderWidth: 1
+              }
+            ]
+          });
+        }
 
         // Data for workout types breakdown (Bar chart)
         const workoutTypes = ['Running', 'Cycling', 'Swimming', 'Walking'];
         const workoutTypeCounts = workoutTypes.map(type =>
-          progressData.logs.filter(log => log.activityType === type).length
+          goals.reduce((acc: number, goal) => {
+            return acc + goal.progresses.filter(log => log.metrics === type).length;
+          }, 0)
         );
         setWorkoutTypeData({
           labels: workoutTypes,
@@ -51,19 +57,20 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
         });
 
         // Data for overall progress towards the goal (Line chart)
-        const dates = progressData.logs.map(log => new Date(log.date).toLocaleDateString());
-        const values = progressData.logs.map(log => log.value);
+        const dates = Array.from(new Set(goals.flatMap(goal => goal.progresses.map(log => new Date(log.date).toLocaleDateString()))));
+        const datasets = goals.map(goal => ({
+          label: `Progress for ${goal.activityType}`,
+          data: dates.map(date => {
+            const log = goal.progresses.find(log => new Date(log.date).toLocaleDateString() === date);
+            return log ? log.value : 0;
+          }),
+          fill: false,
+          backgroundColor: '#f97316',
+          borderColor: '#f97316'
+        }));
         setGoalProgressData({
           labels: dates,
-          datasets: [
-            {
-              label: 'Progress Over Time',
-              data: values,
-              fill: false,
-              backgroundColor: '#f97316',
-              borderColor: '#f97316'
-            }
-          ]
+          datasets
         });
 
       } catch (error: any) {
@@ -72,9 +79,9 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
     };
 
     fetchData();
-  }, [goalId]);
+  }, [goalId, workoutLogged, goals]);
 
-  if (!progress) return <p>Loading...</p>;
+  if (!currentGoal) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
@@ -82,7 +89,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
         <h2 className="text-xl font-semibold mb-4">Progress Chart</h2>
         <div className="h-64">
           <Doughnut
-            data={chartData}
+            data={currentGoalProgress}
             options={{
               maintainAspectRatio: false,
               cutout: '80%',
@@ -103,7 +110,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ goalId }) => {
           />
         </div>
         <div className="text-center mt-4">
-          <p className="text-lg">Goal: {progress.goal}</p>
+          <p className="text-lg">Goal: {currentGoal?.goal}</p>
         </div>
       </div>
 

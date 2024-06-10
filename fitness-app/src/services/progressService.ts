@@ -7,12 +7,14 @@ export interface Goal {
   activityType: string;
   goal: number;
   endDate: string;
+  metrics: string;
+  progresses: Log[];  // Include the progresses/logs field
 }
 
 export interface Log {
   date: string;
   value: number;
-  activityType: string;
+  metrics: string;
 }
 
 export interface Progress {
@@ -22,14 +24,13 @@ export interface Progress {
   endDate: string;
   logs: Log[];
 }
-
 // Function to get the bearer token from localStorage
 const getToken = () => {
   return localStorage.getItem('token');
 };
 
 // Set Goal
-export const setGoal = async (goal: Omit<Goal, 'id'>): Promise<Goal> => {
+export const setGoal = async (goal: Omit<Goal, 'id' | 'progresses'>): Promise<Goal> => {
   try {
     const response = await axios.post(
       `${API_URL}/goal`,
@@ -38,6 +39,7 @@ export const setGoal = async (goal: Omit<Goal, 'id'>): Promise<Goal> => {
         end_date: goal.endDate,
         goal: goal.goal,
         activity: goal.activityType,
+        metrics: goal.metrics,
       },
       {
         headers: {
@@ -47,8 +49,8 @@ export const setGoal = async (goal: Omit<Goal, 'id'>): Promise<Goal> => {
       }
     );
 
-    return { ...goal, id: response.data.id }; // Assuming the backend response includes the new goal ID
-  } catch (error:any) {
+    return { ...goal, id: response.data.id, progresses: [] }; // Assuming the backend response includes the new goal ID
+  } catch (error: any) {
     throw new Error(error.response.data.error || 'Failed to set goal');
   }
 };
@@ -57,10 +59,11 @@ export const setGoal = async (goal: Omit<Goal, 'id'>): Promise<Goal> => {
 export const logWorkout = async (progressId: string, log: Log) => {
   try {
     const response = await axios.post(
-      `${API_URL}`,
+      `${API_URL}/log`,
       {
         date: log.date,
-        progress: log.value,
+        progress: Number(log.value),  // Ensure progress value is a number
+        metrics: log.metrics,
       },
       {
         headers: {
@@ -71,7 +74,7 @@ export const logWorkout = async (progressId: string, log: Log) => {
     );
 
     return response.data;
-  } catch (error:any) {
+  } catch (error: any) {
     throw new Error(error.response.data.error || 'Failed to log workout');
   }
 };
@@ -98,10 +101,49 @@ export const fetchProgress = async (progressId: string): Promise<Progress> => {
       logs: progressData.progresses.map((log: any) => ({
         date: log.date,
         value: log.progress,
-        activityType: progressData.activity,
+        metrics: log.metrics,
       })),
     };
-  } catch (error:any) {
+  } catch (error: any) {
     throw new Error(error.response.data.error || 'Failed to fetch progress');
+  }
+};
+
+// Fetch All Goals
+export const fetchAllGoals = async (): Promise<Goal[]> => {
+  try {
+    const response = await axios.get(`${API_URL}/all`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data.map((goal: any) => ({
+      id: goal.goal_id,
+      activityType: goal.activity,
+      goal: goal.goal,
+      endDate: goal.end_date,
+      metrics: goal.metrics,
+      progresses: goal.progresses.map((log: any) => ({
+        date: log.date,
+        value: log.progress,
+        metrics: log.metrics,
+      })),
+    }));
+  } catch (error: any) {
+    throw new Error(error.response.data.error || 'Failed to fetch all goals');
+  }
+};
+
+// Delete Goal
+export const deleteGoal = async (goalId: string) => {
+  try {
+    await axios.delete(`${API_URL}/goal/${goalId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error.response.data.error || 'Failed to delete goal');
   }
 };
