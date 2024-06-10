@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
-import { logWorkout, Log } from '../services/progressService';
+import React, { useState, useEffect } from 'react';
+import { logWorkout, Log, Goal } from '../services/progressService';
 
 interface LogWorkoutProps {
   goalId: string | null;
+  onWorkoutLogged: () => void;
+  goals: Goal[];
 }
 
-const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId }) => {
-  const [formData, setFormData] = useState<Log>({
+const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId, onWorkoutLogged, goals }) => {
+  const [formData, setFormData] = useState<Omit<Log, 'id'>>({
     date: '',
     value: 0,
-    activityType: 'Running' // Default activity type, you can change it as needed
+    metrics: ''
   });
   const [message, setMessage] = useState<string>('');
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(goalId);
+
+  useEffect(() => {
+    if (goalId) {
+      setSelectedGoalId(goalId);
+    }
+  }, [goalId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -20,15 +29,20 @@ const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId }) => {
     });
   };
 
+  const handleGoalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedGoalId(e.target.value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!goalId) {
-      setMessage('Please set a goal first.');
+    if (!selectedGoalId) {
+      setMessage('Please select a goal first.');
       return;
     }
     try {
-      await logWorkout(goalId, formData);  // Use goal ID
+      await logWorkout(selectedGoalId, formData);  // Use goal ID
       setMessage('Workout logged successfully!');
+      onWorkoutLogged();  // Trigger chart update
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -38,16 +52,18 @@ const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId }) => {
     <div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <select
-          name="activityType"
-          value={formData.activityType}
-          onChange={handleChange}
+          name="goalId"
+          value={selectedGoalId || ''}
+          onChange={handleGoalChange}
           required
           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
         >
-          <option value="Running">Running</option>
-          <option value="Cycling">Cycling</option>
-          <option value="Swimming">Swimming</option>
-          <option value="Walking">Walking</option>
+          <option value="">Select Goal</option>
+          {goals.map(goal => (
+            <option key={goal.id} value={goal.id}>
+              {goal.activityType} - {goal.goal} {goal.metrics}
+            </option>
+          ))}
         </select>
         <input
           type="date"
@@ -62,6 +78,15 @@ const LogWorkout: React.FC<LogWorkoutProps> = ({ goalId }) => {
           name="value"
           placeholder="Value (e.g., distance)"
           value={formData.value}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+        />
+        <input
+          type="text"
+          name="metrics"
+          placeholder="Metrics (e.g., km, hours)"
+          value={formData.metrics}
           onChange={handleChange}
           required
           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
