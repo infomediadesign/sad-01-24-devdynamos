@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from './common/NavBar';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 
-const API_URL = 'http://127.0.0.1:5000';  
+const API_URL = 'http://127.0.0.1:5000';
 
 const fetchProgress = async () => {
   try {
@@ -40,7 +39,7 @@ const fetchCalories = async () => {
 };
 
 const Dashboard: React.FC = () => {
-  const { username } = useParams<{ username: string }>();
+  const location = useLocation();
   const [calorieData, setCalorieData] = useState({
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [
@@ -129,21 +128,29 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
+  // Check if the current path is "/dashboard" or its exact match
+  const isDashboard = location.pathname === '/dashboard';
+
   return (
-    <div className="flex min-h-screen">
-      <Navbar />
+    <div className="flex min-h-screen ml-64 p-4">
       <div className="flex-grow p-4">
-        <h1 className="text-2xl font-bold mb-4">Welcome, {username}!</h1>
-        <div className="flex space-x-4">
-          <div className="flex-1 p-2 rounded-lg bg-gray-100 text-gray-900 text-center">
-            <h2 className="text-xl font-semibold mb-2">Calories</h2>
-            <Pie data={calorieData} />
-          </div>
-          <div className="flex-1 p-2 rounded-lg bg-gray-100 text-gray-900 text-center">
-            <h2 className="text-xl font-semibold mb-2">Progress</h2>
-            <Pie data={progressData} />
-          </div>
-        </div>
+        {isDashboard ? (
+          <>
+            <h1 className="text-2xl font-bold mb-4">Welcome!</h1>
+            <div className="flex space-x-4">
+              <div className="flex-1 p-2 rounded-lg bg-gray-100 text-gray-900 text-center">
+                <h2 className="text-xl font-semibold mb-2">Calories</h2>
+                <Pie data={calorieData} />
+              </div>
+              <div className="flex-1 p-2 rounded-lg bg-gray-100 text-gray-900 text-center">
+                <h2 className="text-xl font-semibold mb-2">Progress</h2>
+                <Pie data={progressData} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <Outlet />
+        )}
       </div>
     </div>
   );

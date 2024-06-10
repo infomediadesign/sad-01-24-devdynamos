@@ -1,18 +1,22 @@
-import React from 'react';
-import AppRoutes from './routes'; 
-
+import React, { useEffect, useState } from 'react';
+import AppRoutes from './routes';
 import Footer from './components/common/Footer';
+import Navbar from './components/common/NavBar';
 
 const App: React.FC = () => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+
+  useEffect(() => {
+    setToken(localStorage.getItem('token'));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        {/* <h1>FitSync</h1> */}
-      </header>
-      <main>
+    <div className="flex min-h-screen">
+      {token && <Navbar />}
+      <div className={`flex-grow flex flex-col ${token ? 'ml-64' : ''}`}>
         <AppRoutes />
-      </main>
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 };
