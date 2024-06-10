@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
           <div className="aspect-w-16 aspect-h-9">
             <iframe
               className="w-full h-full"
-              src="https://youtu.be/e_eJRDl2J6Y?si=DjboIM_3dB157v9p"
+              src="https://www.youtube.com/embed/VIDEO_ID_2"
               title="Fitness Video 2"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
