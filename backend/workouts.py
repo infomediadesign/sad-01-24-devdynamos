@@ -9,7 +9,7 @@ workouts_bp = Blueprint('workouts', __name__)
 
 def init_workouts_routes(app, mongo):
     body_parts_collection = mongo.db.bodyParts
-    exercises_collection = mongo.db.excercises
+    exercises_collection = mongo.db.exercises
     sessions_collection = mongo.db.sessions
 
     def auth_required(f):
