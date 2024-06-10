@@ -16,6 +16,7 @@ import HomePage from './components/HomePage';
 import MuscleGroupMap from './components/MuscleGroupMap';
 import Exercises from './components/Excercises';
 
+
 const AppRoutes: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
@@ -44,6 +45,7 @@ const AppRoutes: React.FC = () => {
           <Route path='/progressTracking' element={<ProgressTracking/>}/>
           <Route path='/routines'element={<WorkoutRoutine/>}/>
         </Routes>
+
       </div>
     
   );

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiError } from '../components/types'; // Ensure this path is correct based on your project structure
+import { ApiError } from '../components/types'; 
 
 const API_BASE_URL = 'http://127.0.0.1:5000/dashboard';
 
@@ -12,8 +12,7 @@ export const getCalories = async (token: string) => {
     });
     return response.data;
   } catch (error: unknown) {
-    const typedError = error as ApiError; // Use type assertion
-    // Check each level of the object to avoid accessing properties of undefined
+    const typedError = error as ApiError; 
     if (typedError.response && typedError.response.data && typedError.response.data.error) {
       throw typedError.response.data.error;
     } else {
