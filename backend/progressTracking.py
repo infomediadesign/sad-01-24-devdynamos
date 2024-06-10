@@ -11,16 +11,19 @@ def init_progress_routes(app, mongo):
     progress_tracker_collection = mongo.db.progress_tracker
     sessions_collection = mongo.db.sessions
 
-    @app.before_request
-    def authenticate():
-        if request.path.startswith('/progress'):  
+    def auth_required(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if request.method == 'OPTIONS':
+                return '', 204  # Allow OPTIONS requests without authentication
+
             token = request.headers.get('Authorization')
-            if not token or not token.startswith('Bearer '):  
+            if not token or not token.startswith('Bearer '):
                 return jsonify({"error": "Bearer token is missing"}), 401
-            token = token.split('Bearer ')[1]  
+            token = token.split('Bearer ')[1]
             try:
                 payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-                g.user = payload  
+                g.user = payload
                 session = sessions_collection.find_one({'username': payload['username'], 'tokens': token})
                 if not session:
                     return jsonify({"error": "Invalid token"}), 401
@@ -28,8 +31,11 @@ def init_progress_routes(app, mongo):
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
                 return jsonify({"error": "Invalid token"}), 401
+            return f(*args, **kwargs)
+        return decorated_function
 
     @progress_bp.route('/goal', methods=['POST'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -46,10 +52,11 @@ def init_progress_routes(app, mongo):
                     'properties': {
                         'start_date': {'type': 'string', 'format': 'date'},
                         'end_date': {'type': 'string', 'format': 'date'},
-                        'goal': {'type': 'string'},
-                        'activity': {'type': 'string'}
+                        'goal': {'type': 'number'},
+                        'activity': {'type': 'string'},
+                        'metrics': {'type': 'string'}
                     },
-                    'required': ['start_date', 'end_date', 'goal', 'activity']
+                    'required': ['start_date', 'end_date', 'goal', 'activity', 'metrics']
                 }
             }
         ],
@@ -57,9 +64,9 @@ def init_progress_routes(app, mongo):
     })
     def set_progress_goal():
         data = request.get_json()
-        start_date, end_date, goal, activity = data.get('start_date'), data.get('end_date'), data.get('goal'), data.get('activity')
+        start_date, end_date, goal, activity, metrics = data.get('start_date'), data.get('end_date'), data.get('goal'), data.get('activity'), data.get('metrics')
 
-        if not start_date or not end_date or not goal or not activity:
+        if not start_date or not end_date or not goal or not activity or not metrics:
             return jsonify({"error": "All fields are required"}), 400
 
         username = g.user['username']
@@ -88,13 +95,14 @@ def init_progress_routes(app, mongo):
             'end_date': end_date_obj,
             'goal': goal,
             'activity': activity,
+            'metrics': metrics,
             'progresses': [],
             'created_at': datetime.datetime.utcnow().strftime('%Y-%m-%d')
         }
-        progress_tracker_collection.insert_one(goal_data)
-        return jsonify({"message": "Goal set successfully"}), 201
-
-    @progress_bp.route('', methods=['POST'])
+        result = progress_tracker_collection.insert_one(goal_data)
+        return jsonify({"id": str(result.inserted_id), "message": "Goal set successfully"}), 201
+    @progress_bp.route('/log', methods=['POST'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -110,9 +118,10 @@ def init_progress_routes(app, mongo):
                     'type': 'object',
                     'properties': {
                         'date': {'type': 'string', 'format': 'date'},
-                        'progress': {'type': 'number'}
+                        'progress': {'type': 'number'},
+                        'metrics': {'type': 'string'}
                     },
-                    'required': ['date', 'progress']
+                    'required': ['date', 'progress', 'metrics']
                 }
             }
         ],
@@ -120,9 +129,9 @@ def init_progress_routes(app, mongo):
     })
     def log_progress():
         data = request.get_json()
-        date, progress_value = data.get('date'), data.get('progress')
+        date, progress_value, metrics = data.get('date'), data.get('progress'), data.get('metrics')
 
-        if not date or not progress_value:
+        if not date or progress_value is None or not metrics:
             return jsonify({"error": "All fields are required"}), 400
 
         username = g.user['username']
@@ -136,25 +145,31 @@ def init_progress_routes(app, mongo):
         if not goal:
             return jsonify({"error": "No active goal for this period"}), 400
 
+        try:
+            progress_value = float(progress_value)
+            goal_value = float(goal['goal'])
+        except ValueError:
+            return jsonify({"error": "Progress value and goal must be numeric"}), 400
+
         result = progress_tracker_collection.update_one(
             {"_id": goal['_id'], "progresses.date": log_date},
             {"$inc": {"progresses.$.progress": progress_value}}
         )
 
         if result.matched_count == 0:
-            # If no matching date was found, add a new element
             progress_tracker_collection.update_one(
                 {"_id": goal['_id']},
-                {"$push": {"progresses": {"date": log_date, "progress": progress_value}}}
+                {"$push": {"progresses": {"date": log_date, "progress": progress_value, "metrics": metrics}}}
             )
 
         message = "Progress logged successfully"
-        if progress_value >= goal['goal']:
+        if progress_value >= goal_value:
             message += " and goal achieved!"
 
         return jsonify({"message": message}), 200
 
     @progress_bp.route('/all', methods=['GET'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -183,15 +198,19 @@ def init_progress_routes(app, mongo):
                 'goal_id' : str(goal['_id']),
                 'goal': goal['goal'],
                 'activity': goal['activity'],
+                'metrics': goal.get('metrics', ''),  # Use get() to avoid KeyError
                 'progress': total_progress,
                 'start_date': goal['start_date'],
-                'end_date': goal['end_date']
+                'end_date': goal['end_date'],
+                'progresses': goal['progresses']
             }
             goalsResult.append(progress_data)
 
         return jsonify(goalsResult), 200
 
-    @progress_bp.route('', methods=['GET'])
+
+    @progress_bp.route('/date', methods=['GET'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -232,7 +251,8 @@ def init_progress_routes(app, mongo):
 
         return jsonify({"date": log_date, "progress": daily_log['progress']}), 200
     
-    @progress_bp.route('goal/<goal_id>', methods=['DELETE'])
+    @progress_bp.route('/goal/<goal_id>', methods=['DELETE'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -266,7 +286,8 @@ def init_progress_routes(app, mongo):
 
         return jsonify({"message": "Goal deleted successfully"}), 200
     
-    @progress_bp.route('', methods=['DELETE'])
+    @progress_bp.route('/date', methods=['DELETE'])
+    @auth_required
     @swag_from({
         'tags': ['Progress'],
         'responses': {
@@ -312,6 +333,5 @@ def init_progress_routes(app, mongo):
         )
 
         return jsonify({"message": "Progress deleted successfully"}), 200
-
 
     app.register_blueprint(progress_bp, url_prefix='/progress')
