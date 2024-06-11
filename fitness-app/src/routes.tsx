@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Calories from './components/Calories';
-import Progress from './components/Progress';
 import AuthForm from './components/AuthForm';
 import WorkoutRoutine from './components/WorkoutRoutine';
 import ProgressTracking from './components/ProgressTracking';
