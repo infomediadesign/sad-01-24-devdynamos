@@ -31,7 +31,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<AuthForm onLogin={handleLogin} />} />
         <Route path="/dashboard/*" element={token ? <Dashboard /> : <Navigate to="/dashboard" />}>
-          <Route path="progress" element={token ? <Progress /> : <Navigate to="/" /> } />
           <Route path="calories" element={token ? <Calories />: <Navigate to="/" /> } />
         </Route>
         <Route path="/profile" element={token ? <UserProfile /> : <Navigate to="/" /> } /> 
