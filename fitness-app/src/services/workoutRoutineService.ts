@@ -11,7 +11,7 @@ interface WorkoutInput {
 
 
 const openai = new OpenAI({
-apiKey:"",
+apiKey:"sk-proj-axNxl5zsSyWyIMIQ796WT3BlbkFJIEXSqMRRsf6MmrlfHdgM",
 dangerouslyAllowBrowser: true
 });
 

@@ -78,8 +78,8 @@ const WorkoutRoutine: React.FC = () => {
 
         {step === 1 && (
           <div className="flex flex-col items-center">
-            <button onClick={() => { setGender('Male'); handleNext(); }} className={`btn mb-4 ${gender === 'Male' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Male</button>
-            <button onClick={() => { setGender('Female'); handleNext(); }} className={`btn ${gender === 'Female' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Female</button>
+            <button onClick={() => { setGender('Male'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${gender === 'Male' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Male</button>
+            <button onClick={() => { setGender('Female'); handleNext(); }} className={`w-full p-2 rounded-lg font-semibold transition-colors ${gender === 'Female' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Female</button>
           </div>
         )}
 
@@ -91,34 +91,34 @@ const WorkoutRoutine: React.FC = () => {
               id="age"
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
-              className="input mb-4"
+              className="input mb-4 border p-2 rounded-lg"
             />
             <div className="flex space-x-4">
-              <button onClick={handleBack} className="btn-secondary">Go Back</button>
-              <button onClick={handleNext} className="btn">Next</button>
+              <button onClick={handleBack} className="w-full p-2 rounded-lg font-semibold transition-colors bg-gray-300 text-gray-700 hover:bg-gray-400">Go Back</button>
+              <button onClick={handleNext} className="w-full p-2 rounded-lg font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">Next</button>
             </div>
           </div>
         )}
 
         {step === 3 && (
           <div className="flex flex-col items-center">
-            <button onClick={() => { setGoal('Lose Weight'); handleNext(); }} className={`btn mb-4 ${goal === 'Lose Weight' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Lose Weight</button>
-            <button onClick={() => { setGoal('Gain Strength'); handleNext(); }} className={`btn mb-4 ${goal === 'Gain Strength' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Gain Strength</button>
-            <button onClick={() => { setGoal('Gain Muscle'); handleNext(); }} className={`btn ${goal === 'Gain Muscle' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Gain Muscle</button>
+            <button onClick={() => { setGoal('Lose Weight'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${goal === 'Lose Weight' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Lose Weight</button>
+            <button onClick={() => { setGoal('Gain Strength'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${goal === 'Gain Strength' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Gain Strength</button>
+            <button onClick={() => { setGoal('Gain Muscle'); handleNext(); }} className={`w-full p-2 rounded-lg font-semibold transition-colors ${goal === 'Gain Muscle' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Gain Muscle</button>
             <div className="flex space-x-4 mt-4">
-              <button onClick={handleBack} className="btn-secondary">Go Back</button>
+              <button onClick={handleBack} className="w-full p-2 rounded-lg font-semibold transition-colors bg-gray-300 text-gray-700 hover:bg-gray-400">Go Back</button>
             </div>
           </div>
         )}
 
         {step === 4 && (
           <div className="flex flex-col items-center">
-            <button onClick={() => { setFitnessLevel('Novice'); handleNext(); }} className={`btn mb-4 ${fitnessLevel === 'Novice' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Novice</button>
-            <button onClick={() => { setFitnessLevel('Beginner'); handleNext(); }} className={`btn mb-4 ${fitnessLevel === 'Beginner' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Beginner</button>
-            <button onClick={() => { setFitnessLevel('Intermediate'); handleNext(); }} className={`btn mb-4 ${fitnessLevel === 'Intermediate' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Intermediate</button>
-            <button onClick={() => { setFitnessLevel('Advanced'); handleNext(); }} className={`btn ${fitnessLevel === 'Advanced' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}>Advanced</button>
+            <button onClick={() => { setFitnessLevel('Novice'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${fitnessLevel === 'Novice' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Novice</button>
+            <button onClick={() => { setFitnessLevel('Beginner'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${fitnessLevel === 'Beginner' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Beginner</button>
+            <button onClick={() => { setFitnessLevel('Intermediate'); handleNext(); }} className={`w-full p-2 mb-4 rounded-lg font-semibold transition-colors ${fitnessLevel === 'Intermediate' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Intermediate</button>
+            <button onClick={() => { setFitnessLevel('Advanced'); handleNext(); }} className={`w-full p-2 rounded-lg font-semibold transition-colors ${fitnessLevel === 'Advanced' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}>Advanced</button>
             <div className="flex space-x-4 mt-4">
-              <button onClick={handleBack} className="btn-secondary">Go Back</button>
+              <button onClick={handleBack} className="w-full p-2 rounded-lg font-semibold transition-colors bg-gray-300 text-gray-700 hover:bg-gray-400">Go Back</button>
             </div>
           </div>
         )}
@@ -131,24 +131,24 @@ const WorkoutRoutine: React.FC = () => {
                 <button
                   key={equip}
                   onClick={() => handleEquipmentSelect(equip)}
-                  className={`btn ${equipment.includes(equip) ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}
+                  className={`w-full p-2 rounded-lg font-semibold transition-colors ${equipment.includes(equip) ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border'}`}
                 >
                   {equip}
                 </button>
               ))}
             </div>
             <div className="flex space-x-4 mt-4">
-              <button onClick={handleBack} className="btn-secondary">Go Back</button>
-              <button onClick={handleNext} className="btn">Next</button>
+              <button onClick={handleBack} className="w-full p-2 rounded-lg font-semibold transition-colors bg-gray-300 text-gray-700 hover:bg-gray-400">Go Back</button>
+              <button onClick={handleNext} className="w-full p-2 rounded-lg font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">Next</button>
             </div>
           </div>
         )}
 
         {step === 6 && (
           <div className="flex flex-col items-center">
-            <button onClick={handleGenerateRoutine} className="btn mb-4">Generate</button>
+            <button onClick={handleGenerateRoutine} className="w-full p-2 mb-4 rounded-lg font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">Generate</button>
             <div className="flex space-x-4 mt-4">
-              <button onClick={handleBack} className="btn-secondary">Go Back</button>
+              <button onClick={handleBack} className="w-full p-2 rounded-lg font-semibold transition-colors bg-gray-300 text-gray-700 hover:bg-gray-400">Go Back</button>
             </div>
           </div>
         )}
