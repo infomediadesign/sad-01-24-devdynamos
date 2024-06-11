@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { generateWorkoutRoutine } from '../services/workoutRoutineService';
+import React, { useState, useEffect } from 'react';
+import { generateWorkoutRoutine, getFactOfTheDay, getWorkoutTip, getWorkoutQuote } from '../services/workoutRoutineService';
 import BackButton from './common/BackButton';
+import { ClipLoader } from 'react-spinners';
+import { fetchUnsplashImage } from '../services/unsplashService';
 
 interface Exercise {
   name: string;
@@ -25,6 +27,26 @@ const WorkoutRoutine: React.FC = () => {
   const [routine, setRoutine] = useState<{ [key: string]: WorkoutDay }>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fact, setFact] = useState('');
+  const [tip, setTip] = useState('');
+  const [quote, setQuote] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const factOfTheDay = await getFactOfTheDay();
+      const workoutTip = await getWorkoutTip();
+      const workoutQuote = await getWorkoutQuote();
+      setFact(factOfTheDay);
+      setTip(workoutTip);
+      setQuote(workoutQuote);
+
+      const imageUrl = await fetchUnsplashImage('gym');
+      setBackgroundImage(imageUrl);
+    };
+
+    fetchData();
+  }, []);
 
   const handleNext = () => {
     setStep(step + 1);
@@ -58,7 +80,10 @@ const WorkoutRoutine: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+    <div
+      className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4"
+      style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
         <div className="mb-8">
           <div className="flex justify-between items-center">
@@ -73,6 +98,21 @@ const WorkoutRoutine: React.FC = () => {
             {Array(6).fill('').map((_, index) => (
               <div key={index} className={`flex-1 h-1 rounded ${index < step ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
             ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-blue-100 p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-2">Fact of the Day</h3>
+            <p>{fact}</p>
+          </div>
+          <div className="bg-green-100 p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-2">Workout Tip</h3>
+            <p>{tip}</p>
+          </div>
+          <div className="bg-yellow-100 p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-2">Motivational Quote</h3>
+            <p>{quote}</p>
           </div>
         </div>
 
@@ -153,7 +193,11 @@ const WorkoutRoutine: React.FC = () => {
           </div>
         )}
 
-        {loading && <div className="mt-8 text-center">Loading...</div>}
+        {loading && (
+          <div className="mt-8 text-center">
+            <ClipLoader size={50} color={"#123abc"} loading={loading} />
+          </div>
+        )}
         {error && <div className="mt-8 text-center text-red-500">{error}</div>}
 
         {Object.keys(routine).length > 0 && (

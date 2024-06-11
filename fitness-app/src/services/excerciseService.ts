@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import  { OpenAI } from 'openai';
 
 const API_URL = 'http://localhost:5000';
 
@@ -8,6 +9,11 @@ export interface Exercise {
   youtube_link: string;
   description: string;
 }
+const openai = new OpenAI({
+  apiKey: "sk-proj-axNxl5zsSyWyIMIQ796WT3BlbkFJIEXSqMRRsf6MmrlfHdgM",
+  dangerouslyAllowBrowser: true
+});
+
 
 export const fetchExerciseByMuscleGroup = async (muscleGroup: string): Promise<Exercise[]> => {
     try {
@@ -61,3 +67,36 @@ export const fetchExerciseByMuscleGroup = async (muscleGroup: string): Promise<E
 //     });
 // };
 
+export const fetchMuscleGroupFact = async (muscleGroup: string): Promise<string> => {
+  const prompt = `Provide a Fact about ${muscleGroup}`;
+  
+  const response = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: prompt }]
+  });
+
+  return response.choices[0].message.content!.trim();
+};
+
+
+export const fetchMuscleGroupTip  = async (muscleGroup: string): Promise<string> => {
+  const prompt = `Provide a Tip about ${muscleGroup}. like how to keep it healthy and strengthen it or like what to eat to strengthen it or something like this .`;
+  
+  const response = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: prompt }]
+  });
+
+  return response.choices[0].message.content!.trim();
+};
+
+export const fetchMuscleGroupSafetyTip  = async (muscleGroup: string): Promise<string> => {
+  const prompt = `Provide a Safety Tip about ${muscleGroup}. like what is dangerous or like which workouts to avoid or how to keep safe from injuries or something like this`;
+  
+  const response = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: prompt }]
+  });
+
+  return response.choices[0].message.content!.trim();
+};

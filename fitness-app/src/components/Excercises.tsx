@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Slider from 'react-slick';
-import { fetchExerciseByMuscleGroup, Exercise } from '../services/excerciseService';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import { fetchExerciseByMuscleGroup, Exercise, fetchMuscleGroupFact, fetchMuscleGroupTip,fetchMuscleGroupSafetyTip } from '../services/excerciseService';
 
 const Exercises: React.FC = () => {
   const { muscleGroup } = useParams<{ muscleGroup: string }>();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [fact, setFact] = useState<string>('');
+  const [tip, setTip] = useState<string>('');
+  const [safetyTip, setSafetyTip]= useState<String>('');
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchExerciseByMuscleGroup(muscleGroup!)
-      .then(data => {
-        if (data.length > 0) {
-          setExercises(data);
+    Promise.all([
+      fetchExerciseByMuscleGroup(muscleGroup!),
+      fetchMuscleGroupFact(muscleGroup!),
+      fetchMuscleGroupTip(muscleGroup!),
+      fetchMuscleGroupSafetyTip(muscleGroup!)
+    ])
+      .then(([exerciseData, factData, tipData,safetyData]) => {
+        if (exerciseData.length > 0) {
+          setExercises(exerciseData);
+          setFact(factData);
+          setTip(tipData);
+          setSafetyTip(safetyData)
         } else {
           setError('No data found for this muscle group.');
         }
@@ -38,46 +46,51 @@ const Exercises: React.FC = () => {
     return `https://www.youtube.com/embed/${videoId}`;
   };
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-  };
-
   return (
-    <div className="max-w-6xl mx-auto p-4 mt-40">
-      <h1 className="text-4xl font-bold text-blue-600 mb-8 text-center">Exercises for {muscleGroup}</h1>
-      <Slider {...settings}>
+    <div className="max-w-6xl mx-auto p-4 mt-20">
+      <h1 className="text-4xl font-bold text-blue-600 mb-12 text-center">Exercises for {muscleGroup}</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div className="bg-blue-100 p-4 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-2">Fact about {muscleGroup}</h3>
+          <p>{fact}</p>
+        </div>
+        <div className="bg-green-100 p-4 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-2">Health Tip</h3>
+          <p>{tip}</p>
+        </div>
+        <div className="bg-red-100 p-4 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-2">Safety Tip</h3>
+          <p>{safetyTip}</p>
+        </div>
+      </div>
+      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {exercises.map((exercise) => (
-          <div key={exercise._id} className="bg-white shadow-md rounded-lg overflow-hidden mx-2">
+          <div key={exercise._id} className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="bg-blue-600 p-4">
-              <h1 className="text-2xl font-bold text-white">{exercise.name} Exercise</h1>
+              <h1 className="text-2xl font-bold text-white">{exercise.name}</h1>
             </div>
-            <div className="p-4">
-              <div className="aspect-w-16 aspect-h-9 mb-4">
+            <div className="p-6">
+              <div className="mb-6">
                 <iframe
-                  width="560"
+                  width="100%"
                   height="315"
                   src={getEmbedUrl(exercise.youtube_link)}
                   title="YouTube video player"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full h-full"
+                  className="w-full h-full rounded-lg"
                 ></iframe>
               </div>
-              <ul className="list-decimal pl-5">
+              <ul className="list-decimal pl-6 text-gray-700 text-lg">
                 {exercise.description.split('. ').map((point, index) => (
-                  <li key={index} className="mb-2 text-lg">{point}</li>
+                  <li key={index} className="mb-2">{point}</li>
                 ))}
               </ul>
             </div>
           </div>
         ))}
-      </Slider>
+      </div>
     </div>
   );
 };
