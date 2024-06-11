@@ -66,9 +66,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
       setMessage(response.message || 'Success');
 
       if (isLogin && response.jwt_token) {
-        onLogin(response.jwt_token); // Call the onLogin prop to update token in the parent component
-        navigate(`/dashboard/${formData.username}`); // Attach username to the URL path
+        onLogin(response.jwt_token);
+        navigate(`/dashboard/${formData.username}`); 
       }
+      else if (!isLogin) {
+        setIsLogin(true); 
+        setMessage('Registration successful! Please log in.');}
     } catch (error: any) {
       setMessage(error.message);
     } finally {

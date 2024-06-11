@@ -62,8 +62,6 @@ const GetCaloriesByDate: React.FC = () => {
       } else {
         setMessage('Unexpected error');
       }
-
-      // Clear the message after 3 seconds
       setTimeout(() => {
         setMessage('');
       }, 3000);
@@ -99,11 +97,11 @@ const GetCaloriesByDate: React.FC = () => {
         >
           Fetch Calories
         </button>
+        <BackButton className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mt-2" />
         {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
         {calories !== null && (
           <p className="mt-4 text-center text-gray-700">You Have Burnt: {calories} Calories!</p>
         )}
-        <BackButton className="w-full p-3 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 mt-2" />
       </div>
     </div>
   );
