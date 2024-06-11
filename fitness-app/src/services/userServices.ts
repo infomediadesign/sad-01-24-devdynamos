@@ -26,6 +26,7 @@ export const getUserProfile = async () => {
     return response.data;
   } catch (error) {
     handleError(error);
+    throw error;  // Add this line to propagate the error
   }
 };
 
@@ -35,6 +36,7 @@ export const updateUserProfile = async (data: any) => {
     return response.data;
   } catch (error) {
     handleError(error);
+    throw error;  // Add this line to propagate the error
   }
 };
 
@@ -44,5 +46,6 @@ export const deleteUserAccount = async () => {
     return response.data;
   } catch (error) {
     handleError(error);
+    throw error;  // Add this line to propagate the error
   }
 };
