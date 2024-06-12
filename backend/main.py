@@ -30,7 +30,7 @@ init_user_profile_routes(app, mongo)
 swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "Fitness Tracking System",
+        "title": "FitSync",
         "description": "API to get access to features of Application.",
         "version": "1.0.0"
     },
