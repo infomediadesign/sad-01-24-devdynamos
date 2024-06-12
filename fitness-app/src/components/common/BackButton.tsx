@@ -9,7 +9,7 @@ const BackButton: React.FC<BackButtonProps> = ({ className }) => {
   const navigate = useNavigate();
   const username= localStorage.getItem('username')
   const handleClick = () => {
-    navigate(`/dashboard/${username}/*`);
+    navigate(`/dashboard`);
   };
 
   return (

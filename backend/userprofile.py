@@ -91,6 +91,11 @@ def init_user_profile_routes(app, mongo):
                 return jsonify({"error": "Password must be at least 8 characters long and contain at least one special character and one number"}), 400
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             data['password'] = hashed_password
+        if 'username' in data:
+            new_username = data['username']
+            existing_user = users_collection.find_one({'username': new_username})
+            if existing_user and existing_user['_id'] != user['_id']:
+                return jsonify({"error": "Username already exists"}), 400
         for field, value in data.items():
             user[field] = value
         users_collection.update_one({'_id': user['_id']}, {'$set': user})
