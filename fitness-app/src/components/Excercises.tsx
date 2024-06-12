@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchExerciseByMuscleGroup, Exercise, fetchMuscleGroupFact, fetchMuscleGroupTip,fetchMuscleGroupSafetyTip } from '../services/excerciseService';
+import BackButton from './common/BackButton';
 
 const Exercises: React.FC = () => {
   const { muscleGroup } = useParams<{ muscleGroup: string }>();
@@ -88,9 +89,12 @@ const Exercises: React.FC = () => {
                 ))}
               </ul>
             </div>
+            
           </div>
+          
         ))}
       </div>
+      <BackButton className="w-full p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700" />
     </div>
   );
 };
