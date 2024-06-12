@@ -1,6 +1,5 @@
 import OpenAI from "openai";
 
-
 interface WorkoutInput {
   gender: string;
   age: number;
@@ -10,7 +9,7 @@ interface WorkoutInput {
 }
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: "sk-proj-axNxl5zsSyWyIMIQ796WT3BlbkFJIEXSqMRRsf6MmrlfHdgM",
   dangerouslyAllowBrowser: true
 });
 

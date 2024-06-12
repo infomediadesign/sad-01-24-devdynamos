@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY; // Replace with your Unsplash Access Key
+const UNSPLASH_ACCESS_KEY = 'aFrUiF_nCu_YQPJPQWfUZoOgTZ2WQ0Cy08J8roo9s_Q'; // Replace with your Unsplash Access Key
 
 export const fetchUnsplashImage = async (query: string) => {
   try {
