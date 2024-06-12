@@ -6,3 +6,20 @@
     fill: #ffcccc !important; /* Light red on hover */
     transition: fill 0.3s ease;
 }
+
+
+  .btn {
+    @apply bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-lg hover:bg-blue-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded shadow-lg hover:bg-gray-400;
+  }
+  
+  .input {
+    @apply border border-gray-300 rounded py-2 px-4;
+  }
+  
+  .prose {
+    @apply max-w-none;
+  }
