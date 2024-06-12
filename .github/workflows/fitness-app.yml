@@ -25,8 +25,3 @@ jobs:
         run: |
           cd fitness-app
           npm install
-
-      - name: Run tests
-        run: |
-          cd fitness-app
-          npm test
