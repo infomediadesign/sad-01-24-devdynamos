@@ -104,7 +104,7 @@ const DeleteCaloriesByDate: React.FC = () => {
     >
       <div className="w-full max-w-md p-6 bg-blue-100 bg-opacity-60 border-2 border-green-800 rounded-lg shadow-md">
         <div className="flex-shrink-0 mb-6 text-center">
-          <img src="https://i.gifer.com/7kvp.gif" alt="Exercise illustration" className="w-48 h-auto mx-auto" />
+          <img src="https://metro.co.uk/wp-content/uploads/2019/08/Webp.net-gifmaker_1-7550.gif" alt="Exercise illustration" className="w-48 h-auto mx-auto" />
         </div>
         <h2 className="text-2xl font-bold mb-6 text-center">Delete Calories by Date</h2>
         <div className="space-y-4 flex flex-col items-center">
