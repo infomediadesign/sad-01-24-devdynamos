@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000/user';
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -22,7 +22,7 @@ const handleError = (error: unknown) => {
 
 export const getUserProfile = async () => {
   try {
-    const response = await axios.get(`${API_URL}/profile`);
+    const response = await axios.get(`${API_URL}/user/profile`);
     return response.data;
   } catch (error) {
     handleError(error);
@@ -32,7 +32,7 @@ export const getUserProfile = async () => {
 
 export const updateUserProfile = async (data: any) => {
   try {
-    const response = await axios.put(`${API_URL}/profile`, data);
+    const response = await axios.put(`${API_URL}/user/profile`, data);
     return response.data;
   } catch (error) {
     handleError(error);
@@ -42,7 +42,7 @@ export const updateUserProfile = async (data: any) => {
 
 export const deleteUserAccount = async () => {
   try {
-    const response = await axios.delete(`${API_URL}/account`);
+    const response = await axios.delete(`${API_URL}/user/account`);
     return response.data;
   } catch (error) {
     handleError(error);

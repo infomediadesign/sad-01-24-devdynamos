@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApiError } from '../components/types'; 
 
-const API_BASE_URL = 'http://127.0.0.1:5000/dashboard';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 
 export const getCalories = async (token: string) => {
   try {
@@ -23,7 +23,7 @@ export const getCalories = async (token: string) => {
 
 export const getProgress = async (token: string) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/progress`, {
+    const response = await axios.get(`${API_BASE_URL}/dashboard/progress`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

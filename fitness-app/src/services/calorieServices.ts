@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000/calories';
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 
 const setCalorieGoal = async (data: { start_date: string; end_date: string; goal: number; activity: string }) => {
   try {
-    const response = await axios.post(`${API_URL}/goal`, data, {
+    const response = await axios.post(`${API_URL}/calories/goal`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         Username: localStorage.getItem('username') // Add username to headers
@@ -38,7 +38,7 @@ const logCalories = async (data: { date: string; calories: number }) => {
 
 const getProgress = async () => {
   try {
-    const response = await axios.get(`${API_URL}/progress`, {
+    const response = await axios.get(`${API_URL}/calories/progress`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         Username: localStorage.getItem('username') // Add username to headers
@@ -55,7 +55,7 @@ const getProgress = async () => {
 
 const getCaloriesByDate = async (date: string) => {
   try {
-    const response = await axios.get(API_URL, {
+    const response = await axios.get(`${API_URL}/calories`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         Username: localStorage.getItem('username') // Add username to headers
@@ -73,7 +73,7 @@ const getCaloriesByDate = async (date: string) => {
 
 const deleteCaloriesByDate = async (date: string) => {
   try {
-    const response = await axios.delete(API_URL, {
+    const response = await axios.delete(`${API_URL}/calories`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         Username: localStorage.getItem('username') // Add username to headers
@@ -91,7 +91,7 @@ const deleteCaloriesByDate = async (date: string) => {
 
 const deleteGoal = async (start_date: string, end_date: string) => {
   try {
-    const response = await axios.delete(`${API_URL}/goals`, {
+    const response = await axios.delete(`${API_URL}/calories/goals`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         Username: localStorage.getItem('username') // Add username to headers

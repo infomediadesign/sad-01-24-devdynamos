@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000/progress';
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 
 export interface Goal {
   id: string;
@@ -82,7 +82,7 @@ export const logWorkout = async (progressId: string, log: Log) => {
 // Fetch Progress
 export const fetchProgress = async (progressId: string): Promise<Progress> => {
   try {
-    const response = await axios.get(`${API_URL}/all`, {
+    const response = await axios.get(`${API_URL}/progress/all`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -112,7 +112,7 @@ export const fetchProgress = async (progressId: string): Promise<Progress> => {
 // Fetch All Goals
 export const fetchAllGoals = async (): Promise<Goal[]> => {
   try {
-    const response = await axios.get(`${API_URL}/all`, {
+    const response = await axios.get(`${API_URL}/progress/all`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -138,7 +138,7 @@ export const fetchAllGoals = async (): Promise<Goal[]> => {
 // Delete Goal
 export const deleteGoal = async (goalId: string) => {
   try {
-    await axios.delete(`${API_URL}/goal/${goalId}`, {
+    await axios.delete(`${API_URL}/progress/goal/${goalId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

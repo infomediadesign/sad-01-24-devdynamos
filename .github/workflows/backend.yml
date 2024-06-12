@@ -3,10 +3,7 @@ name: Backend CI/CD
 on:
   push:
     branches:
-      - gitact
-  pull_request:
-    branches:
-      - gitact
+      - feature/abc
 
 jobs:
   build:

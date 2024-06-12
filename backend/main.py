@@ -34,7 +34,7 @@ swagger_template = {
         "description": "API to get access to features of Application.",
         "version": "1.0.0"
     },
-    "host": "localhost:5000",  
+    "host": "localhost:5001",  
     "basePath": "/",
     "schemes": [
         "http",
@@ -221,4 +221,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)

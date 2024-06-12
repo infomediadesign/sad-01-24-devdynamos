@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import  { OpenAI } from 'openai';
 
-const API_URL = 'http://127.0.0.1:5000';
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 
 export interface Exercise {
   _id: string;

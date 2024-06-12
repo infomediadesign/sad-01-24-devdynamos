@@ -1,0 +1,27 @@
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/fitness-tracking
+  frontend:
+    build:
+      context: ./fitness-app
+      args:
+        REACT_APP_BACKEND_URL: http://localhost:5001
+    ports:
+      - "4000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:5001
+  mongodb:
+    image: mongo
+    ports:
+      - "28017:27017"
+    volumes:
+      - C:\Users\zabia\neo4j\data:/data/db
+
