@@ -12,7 +12,6 @@ from progressTracking import init_progress_routes
 from dashboard import init_dashboard_routes
 from admin import init_admin_routes
 from userprofile import init_user_profile_routes
-import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
