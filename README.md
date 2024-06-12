@@ -1,4 +1,4 @@
-# FitSync API
+# FitSync
 
 FitSync is a comprehensive fitness application with a backend API built using Flask and a frontend built with React. The application facilitates various features including user registration, login, calorie tracking, workout management, progress tracking, dashboard analytics, and user profile management.
 
